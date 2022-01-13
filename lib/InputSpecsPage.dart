@@ -63,7 +63,6 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     _insertDB(t, m, c);
     Navigator.pop(context);
   }
-
   Future<void> _insertDB(int t, int m, int c) async {
     if( m == -1 ) m = 0;  // set to default
     if( c == -1 ) c = 0;  // set to default

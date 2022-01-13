@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -33,11 +32,23 @@ class RandomWords extends StatefulWidget {
 
 class RandomWordsState  extends State<RandomWords> {
   String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
-  List<Spec> daySpecs = [];
+  List<Spec> _daySpecs = [];
 
-  @override void didChangeDependencies() {
+  @override
+  void initState() {
+    super.initState();
+  }
+  
+  @override
+  void didChangeDependencies() {
     super.didChangeDependencies();
     initializeDateFormatting(Localizations.localeOf(context).languageCode);
+  }
+
+  FutureOr onGoBack(dynamic value) {
+    setState(() {
+      _getDayQuery();
+    });
   }
 
   Future<List<Spec>> _getDayQuery() async {
@@ -76,7 +87,7 @@ class RandomWordsState  extends State<RandomWords> {
           );
         });
   }
-  Row makeDaySpec(Spec spec){
+  Row makeDayExpTileChild(Spec spec){
     return Row(
       children: [
         SizedBox(
@@ -95,29 +106,28 @@ class RandomWordsState  extends State<RandomWords> {
       ],
     );
   }
-  List<Widget> makeDaySpecs(){
+  List<Widget> makeDayExpTileChildren(){
     List<Widget> list = [];
-    for(int i = 0; i < daySpecs.length; i++){
+    for(int i = 0; i < _daySpecs.length; i++){
       list.add(InkWell(
         onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => InputSpecsPage(daySpecs[i])
+                  builder: (context) => InputSpecsPage(_daySpecs[i])
               )
           ).then(onGoBack);
         },
         onLongPress: () {
-          showDeleteDialog(daySpecs[i]);
+          showDeleteDialog(_daySpecs[i]);
         },
-        child: makeDaySpec(daySpecs[i]),
+        child: makeDayExpTileChild(_daySpecs[i]),
       ));
       list.add(SizedBox(height: 10,));
     }
     return list;
   }
-
-  ExpansionTile makeDayExpansionTile(){
+  ExpansionTile makeDayExpTile(){
     return ExpansionTile(
       title: Chip(
         backgroundColor: Colors.blue[100],
@@ -125,11 +135,12 @@ class RandomWordsState  extends State<RandomWords> {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
       ),
       initiallyExpanded: false,
-      children: makeDaySpecs(),
+      children: makeDayExpTileChildren(),
     );
   }
-  Row makeDayHead(){
-    return Row(
+  List<Widget> makeDaySummary(int p, int m, int sum){
+    List<Widget> list = [];
+    list.add(Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -140,10 +151,9 @@ class RandomWordsState  extends State<RandomWords> {
         Expanded(child: Text("합계", textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),)),
       ],
-    );
-  }
-  Row makeDaySums(int p, int m, int sum){
-    return Row(
+    ));
+    list.add(Divider());
+    list.add(Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -157,12 +167,13 @@ class RandomWordsState  extends State<RandomWords> {
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, color: sum >= 0 ? Colors.blue : Colors.orange),)),
       ],
-    );
+    ));
+    return list;
   }
 
   Container makeDayCon(List<Spec>? data) {
     if( data!.isEmpty ) data = [];
-    daySpecs = data;
+    _daySpecs = data;
     print("Here ${data.length.toString()}");
     int p = 0, m = 0, sum = 0;
     for(int i = 0; i < data.length; i++){
@@ -181,19 +192,13 @@ class RandomWordsState  extends State<RandomWords> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            makeDayExpansionTile(),
-            makeDayHead(),
-            Divider(),
-            makeDaySums(p, m, sum),
+            makeDayExpTile(),
+            Column(
+              children: makeDaySummary(p, m, sum)
+            )
           ],
         )
     );
-  }
-
-  FutureOr onGoBack(dynamic value) {
-    setState(() {
-      _getDayQuery();
-    });
   }
 
   @override
