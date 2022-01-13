@@ -3,11 +3,16 @@ import './DBHelper.dart';
 import 'package:intl/intl.dart';
 
 class InputSpecsPage extends StatefulWidget {
+  final Spec nowInstance;
+
+  const InputSpecsPage(this.nowInstance);
+
   @override
   InputSpecsPageState createState() => InputSpecsPageState();
 }
 
 class InputSpecsPageState extends State<InputSpecsPage> {
+  bool isUpdateLoaded = false;
 
   List<bool> typebools = [false, false];
   final List<String> typeNames = ["지출", "수입"];
@@ -15,9 +20,9 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   List<bool> methodbools = [false, false, false, false, false];
   final List<String> methodNames = ["기타", "카드", "이체", "현금", "기타"];
 
-  List<bool> categorybools = [false, false, false, false];
-  final List<String> categoryAvatars = ["\u{2733}", "\u{1F354}", "\u{1F68C}", "\u{1F455}"];
-  final List<String> categoryNames = ["기타", "식비", "교통비", "의류비"];
+  List<bool> categorybools = [false, false, false, false, false];
+  final List<String> categoryAvatars = ["\u{2733}", "\u{1F354}", "\u{1F68C}", "\u{1F455}", "\u{2733}"];
+  final List<String> categoryNames = ["기타", "식비", "교통비", "의류비", "기타"];
 
   final contents = TextEditingController();
 
@@ -64,14 +69,19 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     if( c == -1 ) c = 0;  // set to default
     final ctxt = contents.text.isEmpty ? "." : contents.text;
     var provider = SpecProvider();
+
     var spec = Spec(
-        t,
-        categoryNames[c],
-        m,
-        ctxt,
-        int.parse(money.text.replaceAll(',', '')),
-        DateFormat('yy/MM/dd').format(dateTime));
-    provider.insert(spec);
+        type: t,
+        category: categoryNames[c],
+        method: m,
+        contents: ctxt,
+        money: int.parse(money.text.replaceAll(',', '')),
+        dateTime: DateFormat('yy/MM/dd').format(dateTime));
+    if( isUpdateLoaded ){
+      spec.id = widget.nowInstance.id;
+      provider.update(spec);
+    }
+    else provider.insert(spec);
   }
 
   List<Widget> initTypes(int index){
@@ -112,7 +122,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
             setState(() {
               methodbools[index] = value!;
               if( value ){
-                for(int i = 0; i < methodbools.length; i++){
+                for(int i = 1; i < methodbools.length; i++){
                   if( i != index && methodbools[i] ) methodbools[i] = false;
                 }
               }
@@ -304,8 +314,29 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
   // functions end
 
+  void setInstance(){
+    if( widget.nowInstance.type != -1 ){
+      typebools[widget.nowInstance.type] = true;
+      methodbools[widget.nowInstance.method! == 0 ? 3 : widget.nowInstance.method!] = true;
+      if( widget.nowInstance.category == "기타" ) categorybools[categorybools.length-1] = true;
+      else{
+        for(int i = 0; i < categoryNames.length; i++){
+          if( widget.nowInstance.category! == categoryNames[i] ){
+            categorybools[i] = true;
+            break;
+          }
+        }
+      }
+      contents.text = widget.nowInstance.contents!;
+      money.text = _formatNumber(widget.nowInstance.money.toString().replaceAll(',', ''));
+      dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
+      isUpdateLoaded = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if( !isUpdateLoaded ) setInstance();
     return Scaffold(
       appBar: AppBar(
         title: Text("내역 입력"),
