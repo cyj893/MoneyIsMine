@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './DBHelper.dart';
 import 'package:intl/intl.dart';
+import 'DBHelper.dart';
 
 class InputSpecsPage extends StatefulWidget {
   final Spec nowInstance;
@@ -12,6 +12,7 @@ class InputSpecsPage extends StatefulWidget {
 }
 
 class InputSpecsPageState extends State<InputSpecsPage> {
+  String pageName = "내역 추가";
   bool isUpdateLoaded = false;
 
   List<bool> typebools = [false, false];
@@ -31,6 +32,10 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   late var dateTime = DateTime.now();
   // values end
+
+  void onGoBack(dynamic value) {
+    ;
+  }
 
   int _findIndex(List<bool> list){
     for(int i = 0; i < list.length; i++){
@@ -69,12 +74,13 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     final ctxt = contents.text.isEmpty ? "." : contents.text;
     var provider = SpecProvider();
 
+    int pm = t == 0 ? -1 : 1;
     var spec = Spec(
         type: t,
         category: categoryNames[c],
         method: m,
         contents: ctxt,
-        money: int.parse(money.text.replaceAll(',', '')),
+        money: pm * int.parse(money.text.replaceAll(',', '')),
         dateTime: DateFormat('yy/MM/dd').format(dateTime));
     if( isUpdateLoaded ){
       spec.id = widget.nowInstance.id;
@@ -315,6 +321,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   void setInstance(){
     if( widget.nowInstance.type != -1 ){
+      pageName = "내역 수정";
       typebools[widget.nowInstance.type] = true;
       methodbools[widget.nowInstance.method! == 0 ? 3 : widget.nowInstance.method!] = true;
       if( widget.nowInstance.category == "기타" ) categorybools[categorybools.length-1] = true;
@@ -327,7 +334,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         }
       }
       contents.text = widget.nowInstance.contents!;
-      money.text = _formatNumber(widget.nowInstance.money.toString().replaceAll(',', ''));
+      money.text = _formatNumber((widget.nowInstance.money < 0 ? -widget.nowInstance.money : widget.nowInstance.money).toString().replaceAll(',', ''));
       dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
       isUpdateLoaded = true;
     }
@@ -338,7 +345,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     if( !isUpdateLoaded ) setInstance();
     return Scaffold(
       appBar: AppBar(
-        title: Text("내역 입력"),
+        title: Text(pageName),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

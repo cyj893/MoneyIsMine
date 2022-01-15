@@ -97,6 +97,18 @@ class SpecProvider {
     });
     return list;
   }
+
+  Future<Map<String, int>> getSumQuery(String query) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    if( maps.isEmpty ) return {};
+
+    Map<String, int> map = {};
+    for(int i = 0; i < maps.length; i++){
+      map[maps[i]["dateTime"]] = maps[i]["SUM(money)"];
+    }
+    return map;
+  }
 }
 
 class Spec {

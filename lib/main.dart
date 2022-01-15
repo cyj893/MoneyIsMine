@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import './InputSpecsPage.dart';
+import 'InputSpecsPage.dart';
+import 'BottomNaviBar.dart';
 import 'DBHelper.dart';
 
 void main() {
@@ -20,17 +21,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'main',
-      home: RandomWords(),
+      home: MyHomePage(),
     );
   }
 }
 
-class RandomWords extends StatefulWidget {
+class MyHomePage extends StatefulWidget {
+
+  const MyHomePage();
+
   @override
-  RandomWordsState createState() => RandomWordsState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
-class RandomWordsState  extends State<RandomWords> {
+class MyHomePageState  extends State<MyHomePage> {
   String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
   List<Spec> _daySpecs = [];
 
@@ -99,7 +103,7 @@ class RandomWordsState  extends State<RandomWords> {
         ),
         SizedBox(
             width: 100,
-            child: Text("\₩ ${_formatNumber(spec.money.toString().replaceAll(',', ''))}",
+            child: Text("\₩ ${_formatNumber((spec.money < 0 ? -spec.money : spec.money).toString().replaceAll(',', ''))}",
               textAlign: TextAlign.end,
               style: TextStyle(color: spec.type == 1 ? Colors.blue : Colors.orange),)
         ),
@@ -177,8 +181,7 @@ class RandomWordsState  extends State<RandomWords> {
     print("Here ${data.length.toString()}");
     int p = 0, m = 0, sum = 0;
     for(int i = 0; i < data.length; i++){
-      int pm = data[i].type == 0 ? -1 : 1;
-      pm == 1 ? p += data[i].money : m -= data[i].money;
+      data[i].type == 1 ? p += data[i].money : m += data[i].money;
     }
     sum = p + m;
     return Container(
@@ -209,17 +212,7 @@ class RandomWordsState  extends State<RandomWords> {
           appBar: AppBar(
             title: Text("main"),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => InputSpecsPage(Spec(type: -1, money: 0))
-                  )
-              ).then(onGoBack);
-            },
-            child: Icon(Icons.add),
-          ),
+          bottomNavigationBar: BottomNaviBarProvider().getBottomNaviBar(context, onGoBack),
           body: FutureBuilder<List<Spec>>(
             future: _getDayQuery(),
             initialData: <Spec>[],
