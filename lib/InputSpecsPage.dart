@@ -66,7 +66,6 @@ class InputSpecsPageState extends State<InputSpecsPage> {
       return ;
     }
     _insertDB(t, m, c);
-    Navigator.pop(context);
   }
   Future<void> _insertDB(int t, int m, int c) async {
     if( m == -1 ) m = 0;  // set to default
@@ -87,6 +86,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
       provider.update(spec);
     }
     else provider.insert(spec);
+    Navigator.pop(context, spec);
   }
 
   List<Widget> initTypes(int index){

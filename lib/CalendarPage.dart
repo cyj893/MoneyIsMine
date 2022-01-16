@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'DBHelper.dart';
+import 'DaySpecCon.dart';
 
 class CalendarPage extends StatefulWidget {
 
@@ -138,6 +139,11 @@ class CalendarPageState extends State<CalendarPage> {
     );
   }
 
+  Widget selectedDayCon(){
+    if( _selectedDay == null ) return SizedBox.shrink();
+    return DaySpecCon(DateFormat('yy/MM/dd').format(_selectedDay));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,17 +170,20 @@ class CalendarPageState extends State<CalendarPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-
-            FutureBuilder<Map<String, int>>(
-              future: _getSumQuery(nowTypeQuery()),
-              initialData: DateSpecsMap,
-              builder: (context, snapshot) {
-                return _makeTableCalendar(snapshot.data);
-              },
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              FutureBuilder<Map<String, int>>(
+                future: _getSumQuery(nowTypeQuery()),
+                initialData: DateSpecsMap,
+                builder: (context, snapshot) {
+                  return _makeTableCalendar(snapshot.data);
+                },
+              ),
+              Divider(),
+              selectedDayCon(),
+            ],
+          ),
         )
         ),
       );
