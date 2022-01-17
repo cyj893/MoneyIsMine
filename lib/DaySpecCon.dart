@@ -30,12 +30,6 @@ class DaySpecConState extends State<DaySpecCon> {
   }
 
   Future<List<Spec>> _getDayQuery() async {
-    /*
-    if( _daySpecs.length > 0 ){
-      print("Already have one");
-      return [];
-    }
-     */
     String yy = widget.date.substring(0, 2);
     String MM = widget.date.substring(3, 5);
     String dd = widget.date.substring(6, 8);
@@ -65,6 +59,7 @@ class DaySpecConState extends State<DaySpecCon> {
               TextButton(
                   onPressed: () {
                     SpecProvider().delete(spec);
+                    PicProvider().deleteSpec(spec.id!);
                     _daySpecs.removeWhere((item) => item.id == spec.id);
                     Navigator.of(context).pop();
                     onGoBack(null);
@@ -130,7 +125,7 @@ class DaySpecConState extends State<DaySpecCon> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => InputSpecsPage(Spec(type: -1, money: 0))
+                builder: (context) => InputSpecsPage(Spec(type: -2, money: 0, dateTime: widget.date))
             )
         ).then(onGoBack);
       },
@@ -142,7 +137,7 @@ class DaySpecConState extends State<DaySpecCon> {
   ExpansionTile makeDayExpTile() {
     return ExpansionTile(
       title: Chip(
-        backgroundColor: Colors.blue[100],
+        backgroundColor: Colors.blue[200],
         label: Text(
           "${widget.date} (${DateFormat.E('ko_KR').format(DateFormat("yy/MM/dd").parse(widget.date))})",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
@@ -220,12 +215,12 @@ class DaySpecConState extends State<DaySpecCon> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Spec>>(
-      future: _getDayQuery(),
-      initialData: <Spec>[],
-      builder: (context, snapshot) {
-        return makeDayCon();
-      },
-    );
+          future: _getDayQuery(),
+          initialData: <Spec>[],
+          builder: (context, snapshot) {
+            return makeDayCon();
+          },);
+
   }
 }
 

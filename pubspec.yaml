@@ -33,7 +33,7 @@ dependencies:
   path:
   intl:
   table_calendar:
-  provider: ^5.0.0
+  image_picker:
 
 
   # The following adds the Cupertino Icons font to your application.

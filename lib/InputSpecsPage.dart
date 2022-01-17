@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'DBHelper.dart';
 
 class InputSpecsPage extends StatefulWidget {
@@ -31,10 +33,36 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   final money = TextEditingController();
 
   late var dateTime = DateTime.now();
+
+  final memo = TextEditingController();
+
+  final ImagePicker picker = ImagePicker();
+  List<int> picbools = [];
+  List<XFile> _images = [];
+  List<Picture> _existingImages = [];
   // values end
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void onGoBack(dynamic value) {
     ;
+  }
+
+  Future<List<Picture>> _getPicDB(int i) async {
+    List<Picture> newlist = await PicProvider().getQuery(
+      '''
+      SELECT * FROM Pics
+      WHERE specID = ${i}
+      '''
+    );
+    setState(() {
+      _existingImages = newlist;
+    });
+    print("Pic Here ${_existingImages.length}");
+    return newlist;
   }
 
   int _findIndex(List<bool> list){
@@ -72,6 +100,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     if( c == -1 ) c = 0;  // set to default
     final ctxt = contents.text.isEmpty ? "." : contents.text;
     var provider = SpecProvider();
+    var picProvider = PicProvider();
 
     int pm = t == 0 ? -1 : 1;
     var spec = Spec(
@@ -81,11 +110,25 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         contents: ctxt,
         money: pm * int.parse(money.text.replaceAll(',', '')),
         dateTime: DateFormat('yy/MM/dd').format(dateTime));
+
+    for(int i = 0; i < picbools.length; i++){
+      int index = picbools[i];
+      if( index > _existingImages.length ) _images.removeAt(index-_existingImages.length-1);
+      else picProvider.delete(_existingImages[index-1]);
+    }
     if( isUpdateLoaded ){
       spec.id = widget.nowInstance.id;
       provider.update(spec);
+      for(int i = 0; i < _images.length; i++){
+        picProvider.insert(Picture(specID: spec.id!, picture: await _images[i].readAsBytes()));
+      }
     }
-    else provider.insert(spec);
+    else{
+      spec.id = await provider.insert(spec);
+      for(int i = 0; i < _images.length; i++){
+        picProvider.insert(Picture(specID: spec.id!, picture: await _images[i].readAsBytes()));
+      }
+    }
     Navigator.pop(context, spec);
   }
 
@@ -319,24 +362,100 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
   // functions end
 
+  Container makeMemoCon(){
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      height: 50,
+      child: Row(
+        children: <Widget>[
+          const SizedBox(
+            width: 100,
+            child: Text("메모"),
+          ),
+          Expanded(
+              child: TextField(
+                controller: memo,
+                decoration: const InputDecoration(
+                  hintText: "메모를 입력하세요",
+                  isDense: true,
+                ),
+              )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container makePicCon(){
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      height: MediaQuery.of(context).size.width / 3,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _images.length + _existingImages.length + 1,
+        itemBuilder: (context, index) {
+          if( index == 0 ) {
+            return IconButton(
+                iconSize: 25,
+                icon: Icon(Icons.add_circle, color: Colors.blue[200],),
+                onPressed: () async {
+                  List<XFile>? images = await picker.pickMultiImage();
+                  if( images != null ){
+                    setState(() {
+                      _images.addAll(images);
+                    });
+                  }
+                },
+              );
+          }
+          if( picbools.contains(index) ) return SizedBox.shrink();
+          if( index <= _existingImages.length ){
+            return InkWell(
+              onLongPress: () {
+                setState(() {
+                  picbools.add(index);
+                });
+              },
+              child: Image.memory(_existingImages[index-1].picture),
+            );
+          }
+          return InkWell(
+            onLongPress: () {
+              setState(() {
+                picbools.add(index);
+              });
+            },
+            child: Image.file(File(_images[index-_existingImages.length-1].path)),
+          );
+        },
+      )
+    );
+  }
+
   void setInstance(){
     if( widget.nowInstance.type != -1 ){
-      pageName = "내역 수정";
-      typebools[widget.nowInstance.type] = true;
-      methodbools[widget.nowInstance.method! == 0 ? 3 : widget.nowInstance.method!] = true;
-      if( widget.nowInstance.category == "기타" ) categorybools[categorybools.length-1] = true;
+      if( widget.nowInstance.type == -2 ){
+        dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
+      }
       else{
-        for(int i = 0; i < categoryNames.length; i++){
-          if( widget.nowInstance.category! == categoryNames[i] ){
-            categorybools[i] = true;
-            break;
+        pageName = "내역 수정";
+        typebools[widget.nowInstance.type] = true;
+        methodbools[widget.nowInstance.method! == 0 ? 3 : widget.nowInstance.method!] = true;
+        if( widget.nowInstance.category == "기타" ) categorybools[categorybools.length-1] = true;
+        else{
+          for(int i = 0; i < categoryNames.length; i++){
+            if( widget.nowInstance.category! == categoryNames[i] ){
+              categorybools[i] = true;
+              break;
+            }
           }
         }
+        contents.text = widget.nowInstance.contents!;
+        money.text = _formatNumber((widget.nowInstance.money < 0 ? -widget.nowInstance.money : widget.nowInstance.money).toString().replaceAll(',', ''));
+        dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
+        isUpdateLoaded = true;
+        _getPicDB(widget.nowInstance.id!);
       }
-      contents.text = widget.nowInstance.contents!;
-      money.text = _formatNumber((widget.nowInstance.money < 0 ? -widget.nowInstance.money : widget.nowInstance.money).toString().replaceAll(',', ''));
-      dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
-      isUpdateLoaded = true;
     }
   }
 
@@ -358,6 +477,8 @@ class InputSpecsPageState extends State<InputSpecsPage> {
               makeContentsCon(), Divider(),
               makeMoneyCon(), Divider(),
               makeDateTimeCon(), Divider(),
+              makeMemoCon(), Divider(),
+              makePicCon(), Divider(),
             ],
           ),
         ),
@@ -366,7 +487,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         onPressed: (){
           _submit();
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.check_rounded),
       ),
     );
   }
