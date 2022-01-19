@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'InputSpecsPage.dart';
 import 'DBHelper.dart';
+import 'SpecPage.dart';
 
 class DaySpecCon extends StatefulWidget {
 
@@ -98,18 +99,13 @@ class DaySpecConState extends State<DaySpecCon> {
     List<Widget> list = [];
     for (int i = 0; i < _daySpecs.length; i++) {
       list.add(InkWell(
-        onTap: () async {
-          final result = await Navigator.push(
+        onTap: () {
+          Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => InputSpecsPage(_daySpecs[i])
+                  builder: (context) => SpecPage(_daySpecs[i])
               )
-          );
-          if( result != null ){
-            setState(() {
-              _daySpecs[_daySpecs.indexWhere((item) => item.id == result.id )] = result;
-            });
-          }
+          ).then(onGoBack);
         },
         onLongPress: () {
           showDeleteDialog(_daySpecs[i]);

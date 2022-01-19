@@ -99,6 +99,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     if( m == -1 ) m = 0;  // set to default
     if( c == -1 ) c = 0;  // set to default
     final ctxt = contents.text.isEmpty ? "." : contents.text;
+    final mtxt = memo.text.isEmpty ? "." : memo.text;
     var provider = SpecProvider();
     var picProvider = PicProvider();
 
@@ -109,7 +110,8 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         method: m,
         contents: ctxt,
         money: pm * int.parse(money.text.replaceAll(',', '')),
-        dateTime: DateFormat('yy/MM/dd').format(dateTime));
+        dateTime: DateFormat('yy/MM/dd').format(dateTime),
+        memo: mtxt);
 
     for(int i = 0; i < picbools.length; i++){
       int index = picbools[i];
@@ -453,6 +455,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         contents.text = widget.nowInstance.contents!;
         money.text = _formatNumber((widget.nowInstance.money < 0 ? -widget.nowInstance.money : widget.nowInstance.money).toString().replaceAll(',', ''));
         dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
+        memo.text = widget.nowInstance.memo!;
         isUpdateLoaded = true;
         _getPicDB(widget.nowInstance.id!);
       }
