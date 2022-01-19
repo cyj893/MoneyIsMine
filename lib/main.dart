@@ -2,14 +2,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'DBHelper.dart';
 import 'DaySpecCon.dart';
 import 'BottomNaviBar.dart';
 
 void main() {
   runApp(
-    const MaterialApp(
-      home: MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+      ],
+      child: MyApp(),
     ),
   );
 }
@@ -19,6 +23,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<CategoryProvider>().init();
+    print(context.read<CategoryProvider>().categories);
     return MaterialApp(
       title: 'main',
       home: MyHomePage(),

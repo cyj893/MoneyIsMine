@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/src/provider.dart';
 import 'package:scrolling_page_indicator/scrolling_page_indicator.dart';
 import 'DBHelper.dart';
 import 'InputSpecsPage.dart';
@@ -20,10 +21,10 @@ class SpecPageState extends State<SpecPage> {
 
   final List<String> typeNames = ["지출", "수입"];
 
+  final List<String> methodIcons = ["*", "\u{1F4B3}", "\u{1F4B8}", "\u{1F4B5}", "*"];
   final List<String> methodNames = ["기타", "카드", "이체", "현금", "기타"];
 
-  final List<String> categoryAvatars = ["\u{2733}", "\u{1F354}", "\u{1F68C}", "\u{1F455}", "\u{2733}"];
-  final List<String> categoryNames = ["기타", "식비", "교통비", "의류비", "기타"];
+  Map<String, String> categoryMap = {"기타": "*"};
 
   String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
 
@@ -34,6 +35,8 @@ class SpecPageState extends State<SpecPage> {
   @override
   void initState() {
     super.initState();
+
+    categoryMap = context.read<CategoryProvider>().map;
     onGoBack(null);
   }
 
@@ -58,24 +61,39 @@ class SpecPageState extends State<SpecPage> {
   }
 
   Container makeSpecCon(){
-    String method = methodNames[spec.method!];
     String money = _formatNumber(spec.money.toString().replaceAll(',', ''));
+    String categoryIcon, categoryName;
+    if( categoryMap.containsKey(spec.category!) ){
+      categoryIcon = categoryMap[spec.category!]!;
+      categoryName = spec.category!;
+    }
+    else{
+      categoryIcon = "*";
+      categoryName = "기타";
+    }
     return Container(
-      padding: const EdgeInsets.all(8.0),
-      height: 110,
+      padding: const EdgeInsets.only(left: 8.0),
+      height: 120,
       child: Row(
         children: <Widget>[
           Expanded(child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("수단: ${method}"),
               Chip(
                 avatar: CircleAvatar(
-                  child: Text(categoryAvatars[0]),
+                  child: Text(methodIcons[spec.method!]),
                   backgroundColor: Colors.white,
                 ),
                 backgroundColor: Colors.blue[100],
-                label: Text(categoryNames[0]),
+                label: Text(methodNames[spec.method!]),
+              ),
+              Chip(
+                avatar: CircleAvatar(
+                  child: Text(categoryIcon),
+                  backgroundColor: Colors.white,
+                ),
+                backgroundColor: Colors.blue[100],
+                label: Text(categoryName),
               ),
               Text("내용: ${spec.contents!}"),
             ],

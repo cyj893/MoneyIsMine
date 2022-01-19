@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'dart:io';
+import 'CategoryEditPage.dart';
 import 'DBHelper.dart';
 
 class InputSpecsPage extends StatefulWidget {
@@ -23,9 +25,9 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   List<bool> methodbools = [false, false, false, false, false];
   final List<String> methodNames = ["기타", "카드", "이체", "현금", "기타"];
 
-  List<bool> categorybools = [false, false, false, false, false];
-  final List<String> categoryAvatars = ["\u{2733}", "\u{1F354}", "\u{1F68C}", "\u{1F455}", "\u{2733}"];
-  final List<String> categoryNames = ["기타", "식비", "교통비", "의류비", "기타"];
+  List<bool> categorybools = [];
+  List<String> categoryNames = ["기타"];
+  Map<String, String> categoryMap = {"기타": "*"};
 
   final contents = TextEditingController();
 
@@ -96,8 +98,8 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     _insertDB(t, m, c);
   }
   Future<void> _insertDB(int t, int m, int c) async {
-    if( m == -1 ) m = 0;  // set to default
-    if( c == -1 ) c = 0;  // set to default
+    m = m == -1 ? 0 : m;  // set to default
+    String cate = c == -1 ? "기타" : categoryNames[c];  // set to default
     final ctxt = contents.text.isEmpty ? "." : contents.text;
     final mtxt = memo.text.isEmpty ? "." : memo.text;
     var provider = SpecProvider();
@@ -106,7 +108,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     int pm = t == 0 ? -1 : 1;
     var spec = Spec(
         type: t,
-        category: categoryNames[c],
+        category: cate,
         method: m,
         contents: ctxt,
         money: pm * int.parse(money.text.replaceAll(',', '')),
@@ -197,13 +199,14 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   List<Widget> initCategories(){
     List<Widget> list = [];
-    for(int i = 1; i < categoryNames.length; i++){
+    print(categoryNames);
+    for(int i = 0; i < categoryNames.length; i++){
       list.add(
         InkWell(
           splashColor: Colors.transparent,
           child: Chip(
                 avatar: CircleAvatar(
-                  child: categorybools[i] ? Text("\u{2714}") : Text(categoryAvatars[i]),
+                  child: categorybools[i] ? Text("\u{2714}") : Text(categoryMap[categoryNames[i]]!),
                   backgroundColor: Colors.white,
                 ),
                 backgroundColor: categorybools[i] ? Colors.blueAccent : Colors.blue[100],
@@ -216,7 +219,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                   return ;
                 }
                 categorybools[i] = true;
-                print("Tapped " + categoryAvatars[i]);
+                print("Tapped " + categoryMap[categoryNames[i]]!);
                 for(int j = 0; j < categorybools.length; j++){
                   if( i != j && categorybools[j] ) categorybools[j] = false;
                 }
@@ -241,11 +244,15 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                     Text("카테고리"),
                     IconButton(
                         onPressed: () {
-                          setState(() {
-
-                          });
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CategoryEditPage()
+                              )
+                          );
                         },
-                        icon: Icon(Icons.format_list_bulleted)
+                        icon: Icon(Icons.format_list_bulleted_rounded),
+                      color: Colors.blue[300],
                     ),
                   ]
               )
@@ -464,25 +471,35 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   @override
   Widget build(BuildContext context) {
+    categoryNames = context.watch<CategoryProvider>().categories;
+    categoryMap = context.watch<CategoryProvider>().map;
+    for(int i = 0; i < categoryNames.length; i++){
+      categorybools.add(false);
+    }
     if( !isUpdateLoaded ) setInstance();
     return Scaffold(
       appBar: AppBar(
         title: Text(pageName),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: ListView(
-            children: <Widget>[
-              makeTypeCon(), Divider(),
-              makeMethodCon(), Divider(),
-              makeCategoryCon(), Divider(),
-              makeContentsCon(), Divider(),
-              makeMoneyCon(), Divider(),
-              makeDateTimeCon(), Divider(),
-              makeMemoCon(), Divider(),
-              makePicCon(), Divider(),
-            ],
+      body: GestureDetector(
+        onTap: (){
+          FocusScope.of(context).unfocus();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: ListView(
+              children: <Widget>[
+                makeTypeCon(), Divider(),
+                makeMethodCon(), Divider(),
+                makeCategoryCon(), Divider(),
+                makeContentsCon(), Divider(),
+                makeMoneyCon(), Divider(),
+                makeDateTimeCon(), Divider(),
+                makeMemoCon(), Divider(),
+                makePicCon(), Divider(),
+              ],
+            ),
           ),
         ),
       ),

@@ -75,7 +75,7 @@ class DaySpecConState extends State<DaySpecCon> {
     return Row(
       children: [
         SizedBox(
-          width: 70,
+          width: 80,
           child: Text("${spec.category}"),
         ),
         Expanded(
