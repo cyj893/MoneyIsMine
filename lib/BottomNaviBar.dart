@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'CalendarPage.dart';
+import 'ChartPage.dart';
 import 'DBHelper.dart';
 import 'InputSpecsPage.dart';
 import 'main.dart';
@@ -32,6 +33,15 @@ void goCalendarPage(BuildContext context, onGoBack){
   ).then(onGoBack);
 }
 
+void goChartPage(BuildContext context, onGoBack){
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChartPage()
+      )
+  ).then(onGoBack);
+}
+
 BottomNavigationBar buildBottomNaviBar(BuildContext context, onGoBack){
   return BottomNavigationBar(
     type: BottomNavigationBarType.fixed,
@@ -43,7 +53,7 @@ BottomNavigationBar buildBottomNaviBar(BuildContext context, onGoBack){
       else if( i == 1 ) goInputSpecsPage(context, onGoBack);
       else if( i == 2 ) goInputSpecsPage(context, onGoBack);
       else if( i == 3 ) goCalendarPage(context, onGoBack);
-      else if( i == 4 ) goInputSpecsPage(context, onGoBack);
+      else if( i == 4 ) goChartPage(context, onGoBack);
     },
     items: const [
       BottomNavigationBarItem(

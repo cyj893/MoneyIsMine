@@ -138,6 +138,7 @@ class SpecPageState extends State<SpecPage> {
                 }
             ),
           ),
+          SizedBox(height: 5,),
           ScrollingPageIndicator(
               dotColor: Colors.grey,
               dotSelectedColor: Colors.blue[900],

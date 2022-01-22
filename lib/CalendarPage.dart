@@ -24,7 +24,7 @@ class CalendarPageState extends State<CalendarPage> {
   late Map<String, int> DateSpecsMap = {};
 
   void onGoBack(dynamic value) {
-    ;
+
   }
 
   String nowTypeQuery(){
@@ -44,6 +44,7 @@ class CalendarPageState extends State<CalendarPage> {
   }
 
   int palette(int k){
+    k = k < 0 ? -k : k;
     if( k < 10000 ) return 50;
     if( k < 50000 ) return 100;
     if( k < 100000 ) return 200;

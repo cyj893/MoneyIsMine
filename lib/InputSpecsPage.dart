@@ -155,9 +155,10 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
   Container makeTypeCon(){
     return Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         height: 50,
-        child: Row(children: <Widget>[
+        child: Row(
+          children: <Widget>[
           Text("*", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
           Expanded(child:Row(children: initTypes(0))),
           Expanded(child:Row(children: initTypes(1))),
@@ -185,9 +186,10 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
   Container makeMethodCon(){
     return Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         height: 50,
-        child: Row(children: <Widget>[
+        child: Row(
+          children: <Widget>[
           Expanded(child:Row(children: initMethods(1))),
           Expanded(child:Row(children: initMethods(2))),
           Expanded(child:Row(children: initMethods(3))),
@@ -199,7 +201,6 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   List<Widget> initCategories(){
     List<Widget> list = [];
-    print(categoryNames);
     for(int i = 0; i < categoryNames.length; i++){
       list.add(
         InkWell(
@@ -232,7 +233,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
   Container makeCategoryCon(){
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 8, right: 8),
       height: 50,
       child: Row(
         children: <Widget>[
@@ -243,15 +244,16 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                   children: <Widget>[
                     Text("카테고리"),
                     IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CategoryEditPage()
-                              )
-                          );
-                        },
-                        icon: Icon(Icons.format_list_bulleted_rounded),
+                      iconSize: 20,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CategoryEditPage()
+                            )
+                        );
+                      },
+                      icon: Icon(Icons.format_list_bulleted_rounded),
                       color: Colors.blue[300],
                     ),
                   ]
@@ -270,7 +272,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   Container makeContentsCon(){
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 8, right: 8),
       height: 50,
       child: Row(
         children: <Widget>[
@@ -292,41 +294,82 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     );
   }
 
-  Container makeMoneyCon(){
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      height: 50,
-      child: Row(
-        children: <Widget>[
-          SizedBox(
-            width: 100,
-            child: Row(
+
+  void addMoney(int addVal){
+    if( money.text == "" ) money.text = '${_formatNumber(addVal.toString().replaceAll(',', ''))}';
+    else{
+      int newVal = int.parse(money.text.replaceAll(',', '')) + addVal;
+      money.text = '${_formatNumber(newVal.toString().replaceAll(',', ''))}';
+    }
+  }
+
+  Widget makeButtons(){
+    return isMoneyFocused
+    ? Column(
+      children: [
+        SizedBox(height: 10,),
+        Row(
+          children: [
+            CustomButton( onTap: () { addMoney(1000); }, text: "+1천", ),
+            CustomButton( onTap: () { addMoney(5000); }, text: "+5천", ),
+            CustomButton( onTap: () { addMoney(10000); }, text: "+1만", ),
+            CustomButton( onTap: () { addMoney(50000); }, text: "+5만", ),
+            CustomButton( onTap: () { addMoney(100000); }, text: "+10만", ),
+            CustomButton( onTap: () { addMoney(1000000); }, text: "+100만", ),
+          ],
+        )
+      ],
+    )
+    : SizedBox.shrink();
+  }
+
+  bool isMoneyFocused = false;
+  FocusNode focusNode = FocusNode();
+  AnimatedContainer makeMoneyCon(){
+    focusNode.addListener(() { isMoneyFocused = focusNode.hasFocus; });
+    return AnimatedContainer(
+      padding: const EdgeInsets.only(left: 8, right: 8),
+      height: isMoneyFocused ? 100 : 50,
+      duration: Duration(milliseconds: 300),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
               children: <Widget>[
-                Text("금액 "),
-                Text("*", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
-              ],
-            )
-          ),
-          Expanded(
-              child: TextField(
-                controller: money,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: "금액을 입력하세요",
-                  isDense: true,
-                  suffixText: "\₩",
+                SizedBox(
+                    width: 100,
+                    child: Row(
+                      children: <Widget>[
+                        Text("금액 "),
+                        Text("*", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
+                      ],
+                    )
                 ),
-                onChanged: (string) {
-                  if( string.isEmpty ) return ;
-                  string = '${_formatNumber(string.replaceAll(',', ''))}';
-                  money.value = TextEditingValue(
-                    text: string,
-                    selection: TextSelection.collapsed(offset: string.length),
-                  );
-                },
-              )
-          ),
-        ],
+                Expanded(
+                  child: TextField(
+                    controller: money,
+                    focusNode: focusNode,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      hintText: "금액을 입력하세요",
+                      isDense: true,
+                      suffixText: "\₩",
+                    ),
+                    onChanged: (string) {
+                      if( string.isEmpty ) return ;
+                      string = '${_formatNumber(string.replaceAll(',', ''))}';
+                      money.value = TextEditingValue(
+                        text: string,
+                        selection: TextSelection.collapsed(offset: string.length),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            makeButtons(),
+          ],
+        ),
       ),
     );
   }
@@ -345,7 +388,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
   Container makeDateTimeCon(){
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 8, right: 8),
       height: 50,
       child: Row(
         children: <Widget>[
@@ -373,7 +416,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   Container makeMemoCon(){
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 8, right: 8),
       height: 50,
       child: Row(
         children: <Widget>[
@@ -459,10 +502,10 @@ class InputSpecsPageState extends State<InputSpecsPage> {
             }
           }
         }
-        contents.text = widget.nowInstance.contents!;
+        contents.text = widget.nowInstance.contents! != "." ? widget.nowInstance.contents! : "";
         money.text = _formatNumber((widget.nowInstance.money < 0 ? -widget.nowInstance.money : widget.nowInstance.money).toString().replaceAll(',', ''));
         dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
-        memo.text = widget.nowInstance.memo!;
+        memo.text = widget.nowInstance.memo! != "." ? widget.nowInstance.memo! : "";
         isUpdateLoaded = true;
         _getPicDB(widget.nowInstance.id!);
       }
@@ -487,8 +530,8 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: ListView(
+          child: SingleChildScrollView(
+            child: Column(
               children: <Widget>[
                 makeTypeCon(), Divider(),
                 makeMethodCon(), Divider(),
@@ -500,7 +543,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                 makePicCon(), Divider(),
               ],
             ),
-          ),
+          )
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -511,4 +554,34 @@ class InputSpecsPageState extends State<InputSpecsPage> {
       ),
     );
   }
+}
+
+class CustomButton extends StatelessWidget{
+  final String text;
+  final Color textColor;
+  final Function onTap;
+
+  const CustomButton({
+    Key? key,
+    required this.text,
+    required this.onTap,
+    this.textColor = Colors.blue,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        onTap();
+      },
+      child: Chip(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.grey[200]!, width: 1.5),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        backgroundColor: Colors.white,
+        label: Text(text, style: TextStyle(color: textColor,),),
+      ),);
+  }
+
 }
