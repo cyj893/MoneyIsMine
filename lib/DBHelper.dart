@@ -117,6 +117,18 @@ class SpecProvider {
     return map;
   }
 
+  Future<List<Pair>> getCategorySumQuery(String query) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    if( maps.isEmpty ) return [];
+
+    List<Pair> list = [];
+    for(int i = 0; i < maps.length; i++){
+      list.add(Pair(maps[i]["category"], maps[i]["SUM(money)"]));
+    }
+    return list;
+  }
+
   Future<List<int>> getSummaryQuery(String query) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
@@ -330,4 +342,11 @@ class CategoryProvider with ChangeNotifier {
     }
   }
 
+}
+
+class Pair<T1, T2> {
+  final T1 a;
+  final T2 b;
+
+  Pair(this.a, this.b);
 }

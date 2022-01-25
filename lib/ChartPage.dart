@@ -1,5 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/src/provider.dart';
+import "dart:collection";
 import 'DBHelper.dart';
 
 class ChartPage extends StatefulWidget {
@@ -13,92 +16,90 @@ class ChartPage extends StatefulWidget {
 class ChartPageState extends State<ChartPage> {
   String pageName = "차트";
 
+  List<String> categoryNames = [];
+  List<Pair> categoryMoney = [];
+  Map<String, String> categoryMap = {};
+
   @override
   void initState() {
     super.initState();
-
+    _getCategoryDB();
   }
 
   void onGoBack(dynamic value) {
     ;
   }
 
-  void _getCategoryDB(int i) async {
-    ;
+  Future<List<Pair>> _getCategoryDB() async {
+    if( categoryMoney.length > 0 ) return [];
+    String month = DateFormat('yy/MM/').format(DateTime.now());
+    List<Pair> newList = await SpecProvider().getCategorySumQuery(
+        '''
+        SELECT category, SUM(money) FROM Specs
+        WHERE dateTime BETWEEN '${month+"01"}' AND '${month+"31"}'
+        GROUP BY category;
+        ''');
+    categoryMoney = newList..sort((p1, p2) => p1.b.compareTo(p2.b));
+    print("After sort:---------");
+    for(int i = 0; i < categoryMoney.length; i++){
+      print("${categoryMoney[i].a} ${categoryMoney[i].b}");
+    }
+    return categoryMoney;
   }
 
   List<PieChartSectionData> showingSections() {
-    return List.generate(4, (i) {
+    List<PieChartSectionData> list = [];
+
+    int sum = 0;
+    int ind = 0;
+    for(int i = 0; i < categoryMoney.length; i++){
+      int money = categoryMoney[i].b;
+      if( money > 0 ) break;
+      sum += money;
+      ind++;
+    }
+    print("Sum: ${sum}");
+
+    int hop = ind < 5 ? 200 : 100;
+
+    for(int i = 0; i < ind && i < 9; i++){
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 25.0 : 16.0;
-      final fontSize2 = isTouched ? 20.0 : 15.0;
-      final radius = isTouched ? 60.0 : 50.0;
-      final widgetSize = isTouched ? 40.0 : 30.0;
-      switch (i) {
-        case 0:
-          return PieChartSectionData(
-            color: const Color(0xff0293ee),
-            value: 40,
-            title: '40%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-          );
-        case 1:
-          return PieChartSectionData(
-            color: const Color(0xfff8b250),
-            value: 30,
-            title: '30%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-            badgeWidget: AnimatedContainer(
-              width: widgetSize,
-              height: widgetSize,
-              alignment: Alignment.center,
-              duration: PieChart.defaultDuration,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.blue, width: 3),
-              ),
-              child: AnimatedDefaultTextStyle(
-                child: Text("\u{1F4B5}"),
-                style: TextStyle(fontSize: fontSize2),
-                duration: PieChart.defaultDuration,),
-            ),
-            badgePositionPercentageOffset: .98,
-          );
-        case 2:
-          return PieChartSectionData(
-            color: const Color(0xff845bef),
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-          );
-        case 3:
-          return PieChartSectionData(
-            color: const Color(0xff13d38e),
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-          );
-        default:
-          throw Error();
-      }
-    });
+      final radius = isTouched ? 70.0 : 60.0;
+
+      String category = categoryMoney[i].a;
+      int money = categoryMoney[i].b;
+      double per = money/sum*100;
+
+      String categoryIcon = "*";
+      if( categoryMap.containsKey(category) ) categoryIcon = categoryMap[category]!;
+
+      list.add(PieChartSectionData(
+        color: Colors.orange[(ind-i) * hop],
+        title: "",
+        value: per,
+        radius: radius,
+        badgeWidget: Chip(
+          avatar: CircleAvatar(
+            child: Text(categoryIcon, style: TextStyle(color: Colors.orange),),
+            backgroundColor: Colors.white,
+          ),
+          backgroundColor: Colors.orange[(ind-i) * hop]!,
+          label: isTouched ? TextOutline(
+                              text: "${category}: ${(per).toStringAsFixed(2)}%",
+                              textColor: Colors.white,
+                              outlineColor: Colors.orange,
+                            )
+                           : TextOutline(
+                              text: category,
+                              textColor: Colors.white,
+                              outlineColor: Colors.orange,
+                            ),
+        ),
+        badgePositionPercentageOffset: .98,
+      ));
+    }
+
+    return list;
   }
 
   int touchedIndex = -1;
@@ -107,11 +108,14 @@ class ChartPageState extends State<ChartPage> {
       aspectRatio: 1.3,
       child: Card(
         color: Colors.white,
-        child: Row(
+        child: Column(
           children: <Widget>[
-            const SizedBox(
-              height: 18,
-            ),
+            SizedBox(height: 10,),
+            Text("카테고리 별 지출", style: TextStyle(
+                fontSize: 20,
+                color: Colors.orange,
+                fontWeight: FontWeight.bold,
+              ),),
             Expanded(
               child: AspectRatio(
                 aspectRatio: 1,
@@ -134,53 +138,12 @@ class ChartPageState extends State<ChartPage> {
                         show: false,
                       ),
                       sectionsSpace: 5,
-                      centerSpaceRadius: 40,
+                      centerSpaceRadius: 30,
                       sections: showingSections()),
                 ),
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
-                Indicator(
-                  color: Color(0xff0293ee),
-                  text: 'First',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Color(0xfff8b250),
-                  text: 'Second',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Color(0xff845bef),
-                  text: 'Third',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Color(0xff13d38e),
-                  text: 'Fourth',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-              ],
-            ),
-            const SizedBox(
-              width: 28,
-            ),
+            SizedBox(height: 10,),
           ],
         ),
       ),
@@ -189,6 +152,8 @@ class ChartPageState extends State<ChartPage> {
 
   @override
   Widget build(BuildContext context) {
+    categoryNames = context.watch<CategoryProvider>().categories;
+    categoryMap = context.watch<CategoryProvider>().map;
     return Scaffold(
       appBar: AppBar(
         title: Text(pageName),
@@ -198,7 +163,12 @@ class ChartPageState extends State<ChartPage> {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              makeCategoryChartCon(),
+              FutureBuilder(
+                  future: _getCategoryDB(),
+                  initialData: [],
+                  builder: (context, snapshot) {
+                    return makeCategoryChartCon();
+                  }),
             ],
           ),
         ),
@@ -246,4 +216,39 @@ class Indicator extends StatelessWidget {
       ],
     );
   }
+}
+
+class TextOutline extends StatelessWidget {
+  final String text;
+  final Color textColor;
+  final Color outlineColor;
+
+  const TextOutline({
+    Key? key,
+    required this.text,
+    required this.textColor,
+    required this.outlineColor,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Text(text,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 3
+              ..color = outlineColor,
+          ),),
+        Text(text,
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.bold,
+          ),)
+      ],
+    );
+  }
+
 }
