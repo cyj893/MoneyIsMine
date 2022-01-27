@@ -134,10 +134,21 @@ class SpecProvider {
     final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
     if( maps.isEmpty ) return [0, 0];
 
-    print(maps);
     List<int> list = [];
     list.add(maps[0]["expenditure"]);
     list.add(maps[0]["income"]);
+    return list;
+  }
+
+  Future<List<Pair>> getWeekQuery(String query) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    if( maps.isEmpty ) return [];
+
+    List<Pair> list = [];
+    for(int i = 0; i < maps.length; i++){
+      list.add(Pair(maps[i]["dateTime"], maps[i]["SUM(money)"]));
+    }
     return list;
   }
 }
