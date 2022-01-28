@@ -64,13 +64,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.3"
-  expandable_page_view:
-    dependency: "direct main"
-    description:
-      name: expandable_page_view
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.10"
   fake_async:
     dependency: transitive
     description:
@@ -134,7 +127,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.4+4"
+    version: "0.8.4+5"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -251,7 +244,7 @@ packages:
       name: sqflite
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   sqflite_common:
     dependency: transitive
     description:

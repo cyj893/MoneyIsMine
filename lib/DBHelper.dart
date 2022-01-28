@@ -140,14 +140,15 @@ class SpecProvider {
     return list;
   }
 
-  Future<List<Pair>> getWeekQuery(String query) async {
+  Future<List<List<Pair>>> getWeekQuery(String query) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
     if( maps.isEmpty ) return [];
 
-    List<Pair> list = [];
+    List<List<Pair>> list = [[], []];
     for(int i = 0; i < maps.length; i++){
-      list.add(Pair(maps[i]["dateTime"], maps[i]["SUM(money)"]));
+      list[0].add(Pair(maps[i]["dateTime"], maps[i]["expenditure"] ?? 0));
+      list[1].add(Pair(maps[i]["dateTime"], maps[i]["income"] ?? 0));
     }
     return list;
   }
