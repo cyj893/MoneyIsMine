@@ -14,6 +14,11 @@ class ChartPage extends StatefulWidget {
 
 class ChartPageState extends State<ChartPage> {
   String pageName = "차트";
+  List<Widget> _weekPages = [Center(child: WeekCon(DateTime.now()),), Center(child: WeekCon(DateTime.now().subtract(Duration(days: 7))),),];
+  var _controller = PageController(initialPage: 0);
+  int _prevCount = 1;
+  bool isFirstPage = true;
+  Duration swipeDuration = const Duration(milliseconds: 400);
 
   @override
   void initState() {
@@ -22,6 +27,67 @@ class ChartPageState extends State<ChartPage> {
 
   void onGoBack(dynamic value) {
     ;
+  }
+
+  Widget makeWeekConPageView(){
+    return Stack(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.width*0.5 + 110 + 40,
+          child: PageView.builder(
+            reverse: true,
+            physics: NeverScrollableScrollPhysics(),
+            onPageChanged: (pageId) {
+              if( pageId == 0 ){
+                isFirstPage = true;
+                setState(() {});
+                return ;
+              }
+              if( pageId == 1 && isFirstPage && _weekPages.length > 2 ){
+                isFirstPage = false;
+                setState(() {});
+                return ;
+              }
+              if( pageId == _weekPages.length - 1 ){
+                isFirstPage = false;
+                print("Add last");
+                _prevCount = _prevCount + 1;
+                _weekPages.add(Center(child: WeekCon(DateTime.now().subtract(Duration(days: 7*_prevCount))),));
+                setState(() {});
+              }
+            },
+            controller: _controller,
+            itemCount: _weekPages.length,
+            itemBuilder: (context, i) { return _weekPages[i]; },
+          ),
+        ),
+        Positioned.fill(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    _controller.nextPage(duration: swipeDuration,
+                        curve: Curves.easeIn);
+                  },
+                  icon: const Icon(Icons.arrow_back_ios_rounded),
+                  color: const Color(0x7f7f7f7f),),
+                Expanded(child: Container()),
+                IconButton(
+                  onPressed: () {
+                    if( isFirstPage ) return;
+                    _controller.previousPage(duration: swipeDuration,
+                        curve: Curves.easeIn);
+                  },
+                  icon: const Icon(Icons.arrow_forward_ios_rounded),
+                  color: isFirstPage ? const Color(0x007f7f7f) : const Color(0x7f7f7f7f),),
+              ],
+            ),
+          ),),
+      ],
+    );
   }
 
   @override
@@ -34,11 +100,11 @@ class ChartPageState extends State<ChartPage> {
         child: Center(
           child: Column(
             children: <Widget>[
-              SizedBox(height: 15,),
-              categorySumCon(),
-              SizedBox(height: 15,),
-              WeekCon(),
-              SizedBox(height: 15,),
+              const SizedBox(height: 15,),
+              CategorySumCon(),
+              const SizedBox(height: 15,),
+              makeWeekConPageView(),
+              const SizedBox(height: 15,),
             ],
           ),
         ),
@@ -48,15 +114,15 @@ class ChartPageState extends State<ChartPage> {
 }
 
 
-class categorySumCon extends StatefulWidget {
+class CategorySumCon extends StatefulWidget {
 
-  const categorySumCon();
+  const CategorySumCon();
 
   @override
-  categorySumConState createState() => categorySumConState();
+  CategorySumConState createState() => CategorySumConState();
 }
 
-class categorySumConState extends State<categorySumCon> {
+class CategorySumConState extends State<CategorySumCon> {
   List<String> categoryNames = [];
   List<Pair> categoryMoney = [];
   Map<String, String> categoryMap = {};
@@ -212,14 +278,16 @@ class categorySumConState extends State<categorySumCon> {
 }
 
 class WeekCon extends StatefulWidget {
+  final DateTime _dateTime;
 
-  const WeekCon();
+  const WeekCon(this._dateTime);
 
   @override
   WeekConState createState() => WeekConState();
 }
 
-class WeekConState extends State<WeekCon> {
+//  with AutomaticKeepAliveClientMixin
+class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
   final Duration animDuration = const Duration(milliseconds: 250);
   List<String> weeks = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
   List<String> weekDate = [];
@@ -231,6 +299,10 @@ class WeekConState extends State<WeekCon> {
   int touchedIndex = -1;
   int nowType = 0;
 
+  List<double> sliderNow = [2, 2];
+  List<double> sliderVal = [10000, 50000, 100000, 300000, 500000, 10000000];
+  List<String> sliderValString = ["1만", "5만", "10만", "30만", "50만", "100만"];
+
   @override
   void initState() {
     super.initState();
@@ -241,9 +313,12 @@ class WeekConState extends State<WeekCon> {
     ;
   }
 
+  @override
+  bool get wantKeepAlive => true;
+
   Future<List<Map<int, int>>> _getWeekDB() async {
     if( weekSum[0].length > 0 ) return [{}, {}];
-    DateTime date = DateTime.now();
+    DateTime date = widget._dateTime;
     for(int i = 0; i < 7; i++){
       weekDate.add(DateFormat('yy/MM/dd').format(date.subtract(Duration(days: date.weekday - 1 - i))));
     }
@@ -257,12 +332,7 @@ class WeekConState extends State<WeekCon> {
         WHERE dateTime BETWEEN '${weekDate[0]}' AND '${weekDate[6]}'
         GROUP BY dateTime;
         ''');
-
-    print("요일:---------");
-    print(newList);
     for(int i = 0; i < newList[0].length; i++){
-      print("${newList[0][i].a}: ${newList[0][i].b}");
-      print("${newList[1][i].a}: ${newList[1][i].b}");
       weekSum[0][weekDate.indexOf(newList[0][i].a)] = newList[0][i].b;
       weekSum[1][weekDate.indexOf(newList[1][i].a)] = newList[1][i].b;
     }
@@ -288,7 +358,7 @@ class WeekConState extends State<WeekCon> {
               : const BorderSide(color: Colors.white, width: 0),
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
-            y: 100000,
+            y: sliderVal[sliderNow[nowType].toInt()],
             colors: [palette[nowType][5]],
           ),
         ),
@@ -365,6 +435,7 @@ class WeekConState extends State<WeekCon> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder(
         future: _getWeekDB(),
         initialData: [],
@@ -372,7 +443,7 @@ class WeekConState extends State<WeekCon> {
           return MyCard(
             child: Column(
               children: <Widget>[
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 Row(
                   children: [
                     SizedBox(width: 16,),
@@ -407,17 +478,13 @@ class WeekConState extends State<WeekCon> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 16,),
+                    const SizedBox(width: 16,),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox( height: 20,),
                 Row(
                   children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox( height: 20,),
                     Expanded(
                       child: AspectRatio(
                         aspectRatio: 2.0,
@@ -427,13 +494,46 @@ class WeekConState extends State<WeekCon> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20,),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
+                const SizedBox(height: 10,),
+                Row(
+                  children: [
+                    const SizedBox(width: 8,),
+                    SizedBox(
+                      width: 70,
+                      child: Chip(
+                        backgroundColor: palette[nowType][2],
+                        label: Text(sliderValString[sliderNow[nowType].toInt()],
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    Expanded(child: SliderTheme(
+                      data: SliderThemeData(
+                        activeTrackColor: palette[nowType][2],
+                        inactiveTrackColor: palette[nowType][4],
+                        thumbColor: palette[nowType][2],
+                        activeTickMarkColor: palette[nowType][2],
+                        valueIndicatorColor: palette[nowType][2],
+                        valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+                      ),
+                      child: Slider(
+                        value: sliderNow[nowType],
+                        min: 0,
+                        max: 5,
+                        divisions: 5,
+                        label: sliderValString[sliderNow[nowType].toInt()],
+                        onChanged: (newValue) {
+                          setState(() {
+                            sliderNow[nowType] = newValue;
+                          },
+                          );
+                        },
+                      ),
+                    ),)
+                  ],
                 ),
               ],
             ),
@@ -487,22 +587,27 @@ class MyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 20,
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 1,
-            blurRadius: 7,
-            offset: Offset(0, 3),
+    return Column(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width - 20,
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 7,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: child,
+          child: child,
+        ),
+        SizedBox(height: 10,),
+      ],
     );
   }
 
