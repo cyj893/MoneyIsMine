@@ -154,6 +154,184 @@ class SpecProvider {
   }
 }
 
+class DaySpecProvider {
+  late Database _database;
+
+  Future<Database?> get database async {
+    _database = await initDB();
+    return _database;
+  }
+
+  initDB() async {
+    String path = join(await getDatabasesPath(), 'DaySpecs.db');
+
+    return await openDatabase(
+        path,
+        version: 1,
+        onCreate: (db, version) async {
+          await db.execute('''
+            CREATE TABLE DaySpecs(
+              expenditure INT NOT NULL,
+              income INT NOT NULL,
+              dateTime TEXT NOT NULL,
+              day INT NOT NULL
+            )
+          ''');
+        },
+        onUpgrade: (db, oldVersion, newVersion){}
+    );
+  }
+
+  Future<void> insert(Spec spec, int day) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db!.query(
+        "DaySpecs",
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime]);
+    int expenditure = 0;
+    int income = 0;
+    if( maps.isEmpty ){
+      print("no");
+      await db.insert("DaySpecs", {"expenditure": 0, "income": 0, "dateTime": spec.dateTime, "day": day});
+    }
+    else{
+      expenditure = maps[0]["expenditure"];
+      income = maps[0]["income"];
+    }
+    if( spec.type == 0 ){
+      await db.update(
+        "DaySpecs",
+        {"expenditure": expenditure + spec.money, "dateTime": spec.dateTime, "day": day},
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime],
+      );
+    }
+    else{
+      await db.update(
+        "DaySpecs",
+        {"income": income + spec.money, "dateTime": spec.dateTime, "day": day},
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime],
+      );
+    }
+
+    print("DaySpec ${spec.dateTime} ${expenditure} ${income} Added ${spec.money}");
+  }
+
+  Future<void> update(Spec spec, int day, Spec before) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> beforeMaps = await db!.query(
+        "DaySpecs",
+        where: "dateTime = ?",
+        whereArgs: [before.dateTime]);
+    int expenditure = 0;
+    int income = 0;
+    if( beforeMaps.isEmpty ) return ;
+    else{
+      expenditure = beforeMaps[0]["expenditure"];
+      income = beforeMaps[0]["income"];
+    }
+    if( spec.type == 0 ){
+      await db.update(
+        "DaySpecs",
+        {"expenditure": expenditure - before.money},
+        where: "dateTime = ?",
+        whereArgs: [before.dateTime],
+      );
+    }
+    else{
+      await db.update(
+        "DaySpecs",
+        {"income": income - before.money},
+        where: "dateTime = ?",
+        whereArgs: [before.dateTime],
+      );
+    }
+
+    final List<Map<String, dynamic>> maps = await db.query(
+        "DaySpecs",
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime]);
+    expenditure = 0;
+    income = 0;
+    if( maps.isEmpty ){
+      print("no");
+      await db.insert("DaySpecs", {"expenditure": 0, "income": 0, "dateTime": spec.dateTime, "day": day});
+    }
+    else{
+      expenditure = maps[0]["expenditure"];
+      income = maps[0]["income"];
+    }
+
+    if( spec.type == 0 ){
+      await db.update(
+        "DaySpecs",
+        {"expenditure": expenditure + spec.money},
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime],
+      );
+    }
+    else{
+      await db.update(
+        "DaySpecs",
+        {"income": income + spec.money},
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime],
+      );
+    }
+    print("DaySpec ${spec.dateTime} Updated");
+  }
+
+  Future<void> delete(Spec spec) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db!.query(
+        "DaySpecs",
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime]);
+    int expenditure = 0;
+    int income = 0;
+    if( maps.isEmpty ) return ;
+    else{
+      expenditure = maps[0]["expenditure"];
+      income = maps[0]["income"];
+    }
+
+    if( spec.type == 0 ){
+      await db.update(
+        "DaySpecs",
+        {"expenditure": expenditure - spec.money},
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime],
+      );
+    }
+    else{
+      await db.update(
+        "DaySpecs",
+        {"income": income - spec.money},
+        where: "dateTime = ?",
+        whereArgs: [spec.dateTime],
+      );
+    }
+    print("DaySpec ${spec.dateTime} Updated(delete)");
+  }
+
+  Future<List<List<Pair>>> getAvgQuery(String query) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    if( maps.isEmpty ) return [];
+
+    List<List<Pair>> list = [[], []];
+    for(int i = 0; i < maps.length; i++){
+      list[0].add(Pair(maps[i]["day"], maps[i]["expenditure"] ?? 0));
+      list[1].add(Pair(maps[i]["day"], maps[i]["income"] ?? 0));
+    }
+    return list;
+  }
+}
+
 class Spec {
   int? id;
   int type;

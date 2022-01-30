@@ -60,6 +60,7 @@ class DaySpecConState extends State<DaySpecCon> {
               TextButton(
                   onPressed: () {
                     SpecProvider().delete(spec);
+                    DaySpecProvider().delete(spec);
                     PicProvider().deleteSpec(spec.id!);
                     _daySpecs.removeWhere((item) => item.id == spec.id);
                     Navigator.of(context).pop();

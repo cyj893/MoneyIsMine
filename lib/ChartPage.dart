@@ -144,7 +144,7 @@ class CategorySumConState extends State<CategorySumCon> {
     List<Pair> newList = await SpecProvider().getCategorySumQuery(
         '''
         SELECT category, SUM(money) FROM Specs
-        WHERE dateTime BETWEEN '${monthDate[0]}' AND '${monthDate[1]}'
+        WHERE type = 0 AND dateTime BETWEEN '${monthDate[0]}' AND '${monthDate[1]}'
         GROUP BY category;
         ''');
     categoryMoney = newList..sort((p1, p2) => p1.b.compareTo(p2.b));
@@ -154,7 +154,6 @@ class CategorySumConState extends State<CategorySumCon> {
     }
     return categoryMoney;
   }
-
 
   List<PieChartSectionData> showingSections() {
     List<PieChartSectionData> list = [];
@@ -201,6 +200,40 @@ class CategorySumConState extends State<CategorySumCon> {
     return list;
   }
 
+  Widget makePieChart(){
+    if( categoryMoney.length == 0 || categoryMoney[0].b > 0 ){
+      return Center(
+        child: Text("지출 데이터가 없습니다",
+            style: TextStyle(
+              color: palette[0],
+              fontWeight: FontWeight.bold,
+            ),),
+      );
+    }
+    return PieChart(
+      PieChartData(
+          pieTouchData: PieTouchData(touchCallback:
+              (FlTouchEvent event, pieTouchResponse) {
+            setState(() {
+              if (!event.isInterestedForInteractions ||
+                  pieTouchResponse == null ||
+                  pieTouchResponse.touchedSection == null) {
+                touchedIndex = -1;
+                return;
+              }
+              touchedIndex = pieTouchResponse
+                  .touchedSection!.touchedSectionIndex;
+            });
+          }),
+          borderData: FlBorderData(
+            show: false,
+          ),
+          sectionsSpace: 5,
+          centerSpaceRadius: 30,
+          sections: showingSections()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     categoryNames = context.watch<CategoryProvider>().categories;
@@ -242,28 +275,7 @@ class CategorySumConState extends State<CategorySumCon> {
                     Expanded(
                       child: AspectRatio(
                         aspectRatio: 1.3,
-                        child: PieChart(
-                          PieChartData(
-                              pieTouchData: PieTouchData(touchCallback:
-                                  (FlTouchEvent event, pieTouchResponse) {
-                                setState(() {
-                                  if (!event.isInterestedForInteractions ||
-                                      pieTouchResponse == null ||
-                                      pieTouchResponse.touchedSection == null) {
-                                    touchedIndex = -1;
-                                    return;
-                                  }
-                                  touchedIndex = pieTouchResponse
-                                      .touchedSection!.touchedSectionIndex;
-                                });
-                              }),
-                              borderData: FlBorderData(
-                                show: false,
-                              ),
-                              sectionsSpace: 5,
-                              centerSpaceRadius: 30,
-                              sections: showingSections()),
-                        ),
+                        child: makePieChart(),
                       ),
                     ),
                     SizedBox(width: 20,),
@@ -299,18 +311,16 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
   int touchedIndex = -1;
   int nowType = 0;
 
+  List<int> maxVal = [0, 0];
   List<double> sliderNow = [2, 2];
-  List<double> sliderVal = [10000, 50000, 100000, 300000, 500000, 10000000];
+  List<double> sliderVal = [10000, 50000, 100000, 300000, 500000, 1000000];
   List<String> sliderValString = ["1만", "5만", "10만", "30만", "50만", "100만"];
 
   @override
   void initState() {
     super.initState();
     _getWeekDB();
-  }
-
-  void onGoBack(dynamic value) {
-    ;
+    _getAvgWeekDB();
   }
 
   @override
@@ -335,23 +345,56 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
     for(int i = 0; i < newList[0].length; i++){
       weekSum[0][weekDate.indexOf(newList[0][i].a)] = newList[0][i].b;
       weekSum[1][weekDate.indexOf(newList[1][i].a)] = newList[1][i].b;
+      maxVal[0] = maxVal[0] > -newList[0][i].b ? maxVal[0] : -newList[0][i].b;
+      maxVal[1] = maxVal[1] > newList[1][i].b ? maxVal[1] : newList[1][i].b;
+    }
+    for(int i = 0; i < sliderVal.length; i++){
+      if( maxVal[0] <= sliderVal[i] ){
+        maxVal[0] = i;
+        sliderNow[0] = i.toDouble();
+        break;
+      }
+    }
+    for(int i = 0; i < sliderVal.length; i++){
+      if( maxVal[1] <= sliderVal[i] ){
+        maxVal[1] = i;
+        sliderNow[1] = i.toDouble();
+        break;
+      }
     }
     return weekSum;
   }
 
-  BarChartGroupData makeGroupData(
-      int x,
-      double y, {
-        bool isTouched = false,
-        double width = 22,
-        List<int> showTooltips = const [],
-      }) {
+  List<List<int>> avgWeek = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]];
+  Future<List<List<int>>> _getAvgWeekDB() async {
+    List<List<Pair>> newList = await DaySpecProvider().getAvgQuery(
+        '''
+        SELECT AVG(expenditure) as 'expenditure',
+               AVG(income) as 'income',
+               day
+        FROM DaySpecs
+        GROUP BY day;
+        ''');
+    print("AVG-----");
+    for(int i = 0; i < newList[0].length; i++){
+      print("AVG$i----- ${newList[0][i].a-1} ${newList[0][i].b}");
+      avgWeek[0][newList[0][i].a-1] = -newList[0][i].b.toInt();
+      avgWeek[1][newList[1][i].a-1] = newList[1][i].b.toInt();
+    }
+    for(int i = 0; i < 7; i++){
+      print("${avgWeek[0][i]}, ${avgWeek[1][i]}");
+    }
+    return avgWeek;
+  }
+
+  BarChartGroupData makeGroupData(int x, double y,
+          {bool isTouched = false, double width = 22, List<int> showTooltips = const [],}){
     return BarChartGroupData(
       x: x,
       barRods: [
         BarChartRodData(
           y: y,
-          colors: isTouched ? [palette[nowType][0]] : [palette[nowType][2]],
+          colors: isTouched ? [palette[nowType][0]] : [palette[nowType][2].withOpacity(0.5)],
           width: width,
           borderSide: isTouched
               ? BorderSide(color: Colors.lime[900]!, width: 1)
@@ -359,7 +402,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             y: sliderVal[sliderNow[nowType].toInt()],
-            colors: [palette[nowType][5]],
+            colors: [palette[nowType][5].withOpacity(0.7)],
           ),
         ),
       ],
@@ -368,6 +411,8 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
   }
 
   BarChartData mainBarData() {
+    double horizontalInterval = sliderVal[sliderNow[nowType].toInt()]/5 > 10000 ? sliderVal[sliderNow[nowType].toInt()]/5 : 10000;
+    if( sliderNow[nowType].toInt() == 0 ) horizontalInterval = 2000;
     return BarChartData(
       barTouchData: BarTouchData(
         touchTooltipData: BarTouchTooltipData(
@@ -418,18 +463,85 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
           },
         ),
         leftTitles: SideTitles(
-          showTitles: false,
+          showTitles: true,
+          getTextStyles: (context, value) => TextStyle(
+              color: palette[nowType][1], fontWeight: FontWeight.bold, fontSize: 10),
+          margin: 0,
+          getTitles: (double value) {
+            int val = value.toInt();
+            if( val < 1000 ) return "$val";
+            if( 1000 <= val && val < 10000 ) return "${val~/1000}천";
+            return "${val~/10000}만";
+          },
         ),
       ),
-      borderData: FlBorderData(
-        show: false,
-      ),
+      borderData: FlBorderData(show: false,),
       barGroups: List.generate(7, (i) {
         int m = nowType == 0 ? -1 : 1;
         double val = weekSum[nowType].containsKey(i) ? m*weekSum[nowType][i]!.toDouble() : 0.0;
         return makeGroupData(i, val, isTouched: i == touchedIndex);
       }),
-      gridData: FlGridData(show: false),
+      gridData: FlGridData(show: true,
+        drawVerticalLine: false,
+        horizontalInterval: horizontalInterval,
+        getDrawingHorizontalLine: (double val) {
+          return FlLine(
+            color: palette[nowType][5].withOpacity(0.5),
+            dashArray: [5, 3],
+          );
+        },
+      ),
+    );
+  }
+
+  BarChartGroupData makeAvgGroupData(int x, double y, { bool isTouched = false,
+    double width = 22,
+    List<int> showTooltips = const [],
+  }) {
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          y: avgWeek[nowType][x].toDouble(),
+          colors: [palette[nowType][3]],
+          width: width,
+          backDrawRodData: BackgroundBarChartRodData(
+            show: true,
+            y: sliderVal[sliderNow[nowType].toInt()],
+            colors: [const Color(0x00000000)],
+          ),
+        ),
+      ],
+    );
+  }
+
+  BarChartData avgBarData() {
+    return BarChartData(
+      barTouchData: BarTouchData(
+        touchCallback: (FlTouchEvent event, barTouchResponse) {},
+      ),
+      titlesData: FlTitlesData(
+        show: true,
+        rightTitles: SideTitles(showTitles: false),
+        topTitles: SideTitles(showTitles: false),
+        bottomTitles: SideTitles(
+          showTitles: true,
+          getTextStyles: (context, value) => const TextStyle(
+              color: Color(0x00000000)),
+          margin: 16,
+        ),
+        leftTitles: SideTitles(
+          showTitles: true,
+          getTextStyles: (context, value) => const TextStyle(
+              color: Color(0x00000000), fontSize: 10),
+          margin: 0,
+        ),
+      ),
+      borderData: FlBorderData(show: false,),
+      barGroups: List.generate(7, (i) {
+        return makeAvgGroupData(i, 0, isTouched: false);
+      }),
+      gridData: FlGridData(show: false,),
     );
   }
 
@@ -488,9 +600,16 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
                     Expanded(
                       child: AspectRatio(
                         aspectRatio: 2.0,
-                        child: BarChart(
-                          mainBarData(),
-                          swapAnimationDuration: animDuration,
+                        child: Stack(
+                          children: [
+                            BarChart(
+                              avgBarData(),
+                            ),
+                            BarChart(
+                              mainBarData(),
+                              swapAnimationDuration: animDuration,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -526,10 +645,11 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
                         divisions: 5,
                         label: sliderValString[sliderNow[nowType].toInt()],
                         onChanged: (newValue) {
+                          print(maxVal[nowType]);
+                          if( newValue < maxVal[nowType] ) return;
                           setState(() {
                             sliderNow[nowType] = newValue;
-                          },
-                          );
+                          });
                         },
                       ),
                     ),)

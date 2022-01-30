@@ -103,6 +103,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     final ctxt = contents.text.isEmpty ? "." : contents.text;
     final mtxt = memo.text.isEmpty ? "." : memo.text;
     var provider = SpecProvider();
+    var dayProvider = DaySpecProvider();
     var picProvider = PicProvider();
 
     int pm = t == 0 ? -1 : 1;
@@ -126,12 +127,14 @@ class InputSpecsPageState extends State<InputSpecsPage> {
       for(int i = 0; i < _images.length; i++){
         picProvider.insert(Picture(specID: spec.id!, picture: await _images[i].readAsBytes()));
       }
+      dayProvider.update(spec, dateTime.weekday, widget.nowInstance);
     }
     else{
       spec.id = await provider.insert(spec);
       for(int i = 0; i < _images.length; i++){
         picProvider.insert(Picture(specID: spec.id!, picture: await _images[i].readAsBytes()));
       }
+      dayProvider.insert(spec, dateTime.weekday);
     }
     Navigator.pop(context, spec);
   }
