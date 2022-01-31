@@ -21,24 +21,16 @@ class CalendarPageState extends State<CalendarPage> {
   var _selectedDay;
   var _focusedDay = DateTime.now();
   var _calendarFormat = CalendarFormat.month;
-  late Map<String, int> DateSpecsMap = {};
+  List<Map<String, int>> DateSpecsMap = [{}, {}, {}];
 
   void onGoBack(dynamic value) {
 
   }
 
-  String nowTypeQuery(){
-    if( nowIndex == 0 ) return "WHERE type = 0";
-    if( nowIndex == 1 ) return "WHERE type = 1";
-    return "";
-  }
-
-  Future<Map<String, int>> _getSumQuery(String s) async {
-    Map<String, int> newMap = await SpecProvider().getSumQuery(
+  Future<List<Map<String, int>>> _getSumQuery() async {
+    List<Map<String, int>> newMap = await DaySpecProvider().getDateQuery(
         '''
-        SELECT dateTime, SUM(money) FROM Specs
-        ${s}
-        GROUP BY dateTime;
+        SELECT dateTime, expenditure, income FROM DaySpecs;
         ''');
     return newMap;
   }
@@ -55,7 +47,7 @@ class CalendarPageState extends State<CalendarPage> {
 
   Widget CalendarCellBuilder(BuildContext context, DateTime dateTime, _, int type){
     String date = DateFormat('yy/MM/dd').format(dateTime);
-    int money = DateSpecsMap.containsKey(date) ? DateSpecsMap[date]! : 0;
+    int money = DateSpecsMap[nowIndex].containsKey(date) ? DateSpecsMap[nowIndex][date]! : 0;
 
     var color = Colors.grey[200];
     var nowIndexColor;
@@ -174,9 +166,9 @@ class CalendarPageState extends State<CalendarPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              FutureBuilder<Map<String, int>>(
-                future: _getSumQuery(nowTypeQuery()),
-                initialData: DateSpecsMap,
+              FutureBuilder<List<Map<String, int>>>(
+                future: _getSumQuery(),
+                initialData: [{},{},{}],
                 builder: (context, snapshot) {
                   return _makeTableCalendar(snapshot.data);
                 },

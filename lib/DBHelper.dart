@@ -199,88 +199,23 @@ class DaySpecProvider {
       expenditure = maps[0]["expenditure"];
       income = maps[0]["income"];
     }
-    if( spec.type == 0 ){
-      await db.update(
-        "DaySpecs",
-        {"expenditure": expenditure + spec.money, "dateTime": spec.dateTime, "day": day},
-        where: "dateTime = ?",
-        whereArgs: [spec.dateTime],
-      );
-    }
-    else{
-      await db.update(
-        "DaySpecs",
-        {"income": income + spec.money, "dateTime": spec.dateTime, "day": day},
-        where: "dateTime = ?",
-        whereArgs: [spec.dateTime],
-      );
-    }
+
+    await db.update(
+      "DaySpecs",
+      spec.type == 0 ? {"expenditure": expenditure + spec.money}
+          : {"income": income + spec.money},
+      where: "dateTime = ?",
+      whereArgs: [spec.dateTime],
+    );
 
     print("DaySpec ${spec.dateTime} ${expenditure} ${income} Added ${spec.money}");
   }
 
   Future<void> update(Spec spec, int day, Spec before) async {
-    final db = await database;
+    await delete(before);
 
-    final List<Map<String, dynamic>> beforeMaps = await db!.query(
-        "DaySpecs",
-        where: "dateTime = ?",
-        whereArgs: [before.dateTime]);
-    int expenditure = 0;
-    int income = 0;
-    if( beforeMaps.isEmpty ) return ;
-    else{
-      expenditure = beforeMaps[0]["expenditure"];
-      income = beforeMaps[0]["income"];
-    }
-    if( spec.type == 0 ){
-      await db.update(
-        "DaySpecs",
-        {"expenditure": expenditure - before.money},
-        where: "dateTime = ?",
-        whereArgs: [before.dateTime],
-      );
-    }
-    else{
-      await db.update(
-        "DaySpecs",
-        {"income": income - before.money},
-        where: "dateTime = ?",
-        whereArgs: [before.dateTime],
-      );
-    }
+    await insert(spec, day);
 
-    final List<Map<String, dynamic>> maps = await db.query(
-        "DaySpecs",
-        where: "dateTime = ?",
-        whereArgs: [spec.dateTime]);
-    expenditure = 0;
-    income = 0;
-    if( maps.isEmpty ){
-      print("no");
-      await db.insert("DaySpecs", {"expenditure": 0, "income": 0, "dateTime": spec.dateTime, "day": day});
-    }
-    else{
-      expenditure = maps[0]["expenditure"];
-      income = maps[0]["income"];
-    }
-
-    if( spec.type == 0 ){
-      await db.update(
-        "DaySpecs",
-        {"expenditure": expenditure + spec.money},
-        where: "dateTime = ?",
-        whereArgs: [spec.dateTime],
-      );
-    }
-    else{
-      await db.update(
-        "DaySpecs",
-        {"income": income + spec.money},
-        where: "dateTime = ?",
-        whereArgs: [spec.dateTime],
-      );
-    }
     print("DaySpec ${spec.dateTime} Updated");
   }
 
@@ -299,22 +234,13 @@ class DaySpecProvider {
       income = maps[0]["income"];
     }
 
-    if( spec.type == 0 ){
-      await db.update(
-        "DaySpecs",
-        {"expenditure": expenditure - spec.money},
-        where: "dateTime = ?",
-        whereArgs: [spec.dateTime],
-      );
-    }
-    else{
-      await db.update(
-        "DaySpecs",
-        {"income": income - spec.money},
-        where: "dateTime = ?",
-        whereArgs: [spec.dateTime],
-      );
-    }
+    await db.update(
+      "DaySpecs",
+      spec.type == 0 ? {"expenditure": expenditure - spec.money}
+                     : {"income": income - spec.money},
+      where: "dateTime = ?",
+      whereArgs: [spec.dateTime],
+    );
     print("DaySpec ${spec.dateTime} Updated(delete)");
   }
 
@@ -327,6 +253,20 @@ class DaySpecProvider {
     for(int i = 0; i < maps.length; i++){
       list[0].add(Pair(maps[i]["day"], maps[i]["expenditure"] ?? 0));
       list[1].add(Pair(maps[i]["day"], maps[i]["income"] ?? 0));
+    }
+    return list;
+  }
+
+  Future<List<Map<String, int>>> getDateQuery(String query) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    if( maps.isEmpty ) return [{}, {}, {}];
+
+    List<Map<String, int>> list = [{}, {}, {}];
+    for(int i = 0; i < maps.length; i++){
+      list[0][maps[i]["dateTime"]] = maps[i]["expenditure"] ?? 0;
+      list[1][maps[i]["dateTime"]] = maps[i]["income"] ?? 0;
+      list[2][maps[i]["dateTime"]] = (maps[i]["expenditure"] ?? 0) + (maps[i]["income"] ?? 0);
     }
     return list;
   }
@@ -369,7 +309,7 @@ class PicProvider {
   }
 
   initDB() async {
-    String path = join(await getDatabasesPath(), 'Piccs.db');
+    String path = join(await getDatabasesPath(), 'Pics.db');
 
     return await openDatabase(
         path,
