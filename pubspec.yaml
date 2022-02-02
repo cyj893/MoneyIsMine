@@ -38,6 +38,7 @@ dependencies:
   provider: ^5.0.0
   fl_chart: ^0.41.0
   # expandable_page_view: ^1.0.10
+  numberpicker: 2.1.1
 
 
   # The following adds the Cupertino Icons font to your application.

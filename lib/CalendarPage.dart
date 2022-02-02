@@ -67,8 +67,11 @@ class CalendarPageState extends State<CalendarPage> {
 
     date = date.substring(6, 8);
     date[0] == '0' ? date = date.substring(1) : date;
-    String moneyString = _formatNumber((money < 0 ? -money : money).toString().replaceAll(',', ''));
+
+    money = money < 0 ? -money : money;
+    String moneyString = _formatNumber(money.toString().replaceAll(',', ''));
     if( money >= 100000 ) moneyString = moneyString.substring(0, moneyString.length-3) + "-";
+    if( money >= 1000000 ) moneyString = (money ~/ 10000).toString();
     return Container(
       padding: EdgeInsets.all(3),
       child: Container(
@@ -83,9 +86,18 @@ class CalendarPageState extends State<CalendarPage> {
           children: [
             Text(date, style: TextStyle(fontSize: 17),),
             Expanded(child: Text("")),
-            Text(moneyString,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: nowIndexColor[900]),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(moneyString,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: money >= 1000000 ? Colors.black54 : nowIndexColor[900]),),
+                money >= 1000000 ? const Text("만",
+                                   textAlign: TextAlign.center,
+                                   style: TextStyle(fontSize: 9, color: Colors.black54, fontWeight: FontWeight.bold),)
+                                 : const SizedBox.shrink(),
+              ],
+            ),
           ],
         ),
       ),
@@ -133,7 +145,7 @@ class CalendarPageState extends State<CalendarPage> {
   }
 
   Widget selectedDayCon(){
-    if( _selectedDay == null ) return SizedBox.shrink();
+    if( _selectedDay == null ) return const SizedBox.shrink();
     return DaySpecCon(DateFormat('yy/MM/dd').format(_selectedDay));
   }
 

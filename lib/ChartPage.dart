@@ -286,7 +286,6 @@ class CategorySumConState extends State<CategorySumCon> {
           );
         });
   }
-
 }
 
 class WeekCon extends StatefulWidget {
@@ -304,6 +303,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
   List<String> weeks = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
   List<String> weekDate = [];
   List<Map<int, int>> weekSum = [{}, {}];
+  List<int> sum = [0, 0];
   List<List<Color>> palette = [
     [Color.fromRGBO(225, 39, 0, 0.7), Color.fromRGBO(255, 78, 2, 0.7), Color.fromRGBO(254, 120, 39, 0.7), Color.fromRGBO(255, 162, 69, 0.7), Color.fromRGBO(254, 199, 105, 0.7), Color.fromRGBO(254, 220, 139, 0.7), Color(0xff9F2B2B)],
     [Color.fromRGBO(0, 39, 225, 0.7), Color.fromRGBO(2, 78, 255, 0.7), Color.fromRGBO(39, 120, 254, 0.7), Color.fromRGBO(69, 162, 255, 0.7), Color.fromRGBO(105, 199, 254, 0.7), Color.fromRGBO(139, 220, 254, 0.7), Color(0xff2B2B9F)],
@@ -342,11 +342,17 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
         WHERE dateTime BETWEEN '${weekDate[0]}' AND '${weekDate[6]}'
         GROUP BY dateTime;
         ''');
+    sum[0] = 0;
+    sum[1] = 0;
     for(int i = 0; i < newList[0].length; i++){
-      weekSum[0][weekDate.indexOf(newList[0][i].a)] = newList[0][i].b;
-      weekSum[1][weekDate.indexOf(newList[1][i].a)] = newList[1][i].b;
-      maxVal[0] = maxVal[0] > -newList[0][i].b ? maxVal[0] : -newList[0][i].b;
-      maxVal[1] = maxVal[1] > newList[1][i].b ? maxVal[1] : newList[1][i].b;
+      int exp = newList[0][i].b;
+      int inc = newList[1][i].b;
+      weekSum[0][weekDate.indexOf(newList[0][i].a)] = exp;
+      weekSum[1][weekDate.indexOf(newList[1][i].a)] = inc;
+      maxVal[0] = maxVal[0] > -exp ? maxVal[0] : -exp;
+      maxVal[1] = maxVal[1] > inc ? maxVal[1] : inc;
+      sum[0] -= exp;
+      sum[1] += inc;
     }
     for(int i = 0; i < sliderVal.length; i++){
       if( maxVal[0] <= sliderVal[i] ){
@@ -362,6 +368,8 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
         break;
       }
     }
+    if( maxVal[0] > 1000000 ) sliderNow[0] = 5;
+    if( maxVal[1] > 1000000 ) sliderNow[1] = 5;
     return weekSum;
   }
 
@@ -411,7 +419,9 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
   }
 
   BarChartData mainBarData() {
-    double horizontalInterval = sliderVal[sliderNow[nowType].toInt()]/5 > 10000 ? sliderVal[sliderNow[nowType].toInt()]/5 : 10000;
+    double verMax = sliderVal[sliderNow[nowType].toInt()];
+    verMax = verMax > maxVal[nowType] ? verMax : maxVal[nowType].toDouble();
+    double horizontalInterval = verMax/5 > 10000 ? verMax/5 : 10000;
     if( sliderNow[nowType].toInt() == 0 ) horizontalInterval = 2000;
     return BarChartData(
       barTouchData: BarTouchData(
@@ -464,6 +474,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
         ),
         leftTitles: SideTitles(
           showTitles: true,
+          reservedSize: 35,
           getTextStyles: (context, value) => TextStyle(
               color: palette[nowType][1], fontWeight: FontWeight.bold, fontSize: 10),
           margin: 0,
@@ -532,6 +543,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
         ),
         leftTitles: SideTitles(
           showTitles: true,
+          reservedSize: 35,
           getTextStyles: (context, value) => const TextStyle(
               color: Color(0x00000000), fontSize: 10),
           margin: 0,
@@ -544,6 +556,8 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
       gridData: FlGridData(show: false,),
     );
   }
+
+  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
 
   @override
   Widget build(BuildContext context) {
@@ -563,7 +577,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text("주간 ${nowType == 0 ? "지출" : "수입"}", style: TextStyle(
+                          Text("주간 ${nowType == 0 ? "지출" : "수입"}: ${_formatNumber(sum[nowType].toString())}원", style: TextStyle(
                             fontSize: 20,
                             color: nowType == 0 ? palette[0][6] : palette[1][6],
                             fontWeight: FontWeight.bold,
