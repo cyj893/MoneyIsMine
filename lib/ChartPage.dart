@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:bezier_chart/bezier_chart.dart';
 import 'package:provider/src/provider.dart';
 import 'DBHelper.dart';
 
@@ -105,6 +106,9 @@ class ChartPageState extends State<ChartPage> {
               const SizedBox(height: 15,),
               makeWeekConPageView(),
               const SizedBox(height: 15,),
+              AvgCon(),
+              const SizedBox(height: 15,),
+              const SizedBox(height: 200,),
             ],
           ),
         ),
@@ -320,7 +324,6 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
   void initState() {
     super.initState();
     _getWeekDB();
-    _getAvgWeekDB();
   }
 
   @override
@@ -333,12 +336,12 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
       weekDate.add(DateFormat('yy/MM/dd').format(date.subtract(Duration(days: date.weekday - 1 - i))));
     }
     print("${weekDate[0]} ~ ${weekDate[6]}");
-    List<List<Pair>> newList = await SpecProvider().getWeekQuery(
+    List<List<Pair>> newList = await DaySpecProvider().getWeekQuery(
         '''
-        SELECT SUM(CASE WHEN type=0 THEN money END) as 'expenditure',
-               SUM(CASE WHEN type=1 THEN money END) as 'income',
+        SELECT expenditure,
+               income,
                dateTime
-        FROM Specs
+        FROM DaySpecs
         WHERE dateTime BETWEEN '${weekDate[0]}' AND '${weekDate[6]}'
         GROUP BY dateTime;
         ''');
@@ -373,28 +376,6 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
     return weekSum;
   }
 
-  List<List<int>> avgWeek = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]];
-  Future<List<List<int>>> _getAvgWeekDB() async {
-    List<List<Pair>> newList = await DaySpecProvider().getAvgQuery(
-        '''
-        SELECT AVG(expenditure) as 'expenditure',
-               AVG(income) as 'income',
-               day
-        FROM DaySpecs
-        GROUP BY day;
-        ''');
-    print("AVG-----");
-    for(int i = 0; i < newList[0].length; i++){
-      print("AVG$i----- ${newList[0][i].a-1} ${newList[0][i].b}");
-      avgWeek[0][newList[0][i].a-1] = -newList[0][i].b.toInt();
-      avgWeek[1][newList[1][i].a-1] = newList[1][i].b.toInt();
-    }
-    for(int i = 0; i < 7; i++){
-      print("${avgWeek[0][i]}, ${avgWeek[1][i]}");
-    }
-    return avgWeek;
-  }
-
   BarChartGroupData makeGroupData(int x, double y,
           {bool isTouched = false, double width = 22, List<int> showTooltips = const [],}){
     return BarChartGroupData(
@@ -402,7 +383,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
       barRods: [
         BarChartRodData(
           y: y,
-          colors: isTouched ? [palette[nowType][0]] : [palette[nowType][2].withOpacity(0.5)],
+          colors: isTouched ? [palette[nowType][0]] : [palette[nowType][2]],
           width: width,
           borderSide: isTouched
               ? BorderSide(color: Colors.lime[900]!, width: 1)
@@ -410,7 +391,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             y: sliderVal[sliderNow[nowType].toInt()],
-            colors: [palette[nowType][5].withOpacity(0.7)],
+            colors: [palette[nowType][5]],
           ),
         ),
       ],
@@ -497,63 +478,11 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
         horizontalInterval: horizontalInterval,
         getDrawingHorizontalLine: (double val) {
           return FlLine(
-            color: palette[nowType][5].withOpacity(0.5),
+            color: palette[nowType][5],
             dashArray: [5, 3],
           );
         },
       ),
-    );
-  }
-
-  BarChartGroupData makeAvgGroupData(int x, double y, { bool isTouched = false,
-    double width = 22,
-    List<int> showTooltips = const [],
-  }) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          y: avgWeek[nowType][x].toDouble(),
-          colors: [palette[nowType][3]],
-          width: width,
-          backDrawRodData: BackgroundBarChartRodData(
-            show: true,
-            y: sliderVal[sliderNow[nowType].toInt()],
-            colors: [const Color(0x00000000)],
-          ),
-        ),
-      ],
-    );
-  }
-
-  BarChartData avgBarData() {
-    return BarChartData(
-      barTouchData: BarTouchData(
-        touchCallback: (FlTouchEvent event, barTouchResponse) {},
-      ),
-      titlesData: FlTitlesData(
-        show: true,
-        rightTitles: SideTitles(showTitles: false),
-        topTitles: SideTitles(showTitles: false),
-        bottomTitles: SideTitles(
-          showTitles: true,
-          getTextStyles: (context, value) => const TextStyle(
-              color: Color(0x00000000)),
-          margin: 16,
-        ),
-        leftTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 35,
-          getTextStyles: (context, value) => const TextStyle(
-              color: Color(0x00000000), fontSize: 10),
-          margin: 0,
-        ),
-      ),
-      borderData: FlBorderData(show: false,),
-      barGroups: List.generate(7, (i) {
-        return makeAvgGroupData(i, 0, isTouched: false);
-      }),
-      gridData: FlGridData(show: false,),
     );
   }
 
@@ -614,16 +543,9 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
                     Expanded(
                       child: AspectRatio(
                         aspectRatio: 2.0,
-                        child: Stack(
-                          children: [
-                            BarChart(
-                              avgBarData(),
-                            ),
-                            BarChart(
-                              mainBarData(),
-                              swapAnimationDuration: animDuration,
-                            ),
-                          ],
+                        child: BarChart(
+                          mainBarData(),
+                          swapAnimationDuration: animDuration,
                         ),
                       ),
                     ),
@@ -676,6 +598,182 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
   }
 
 }
+
+
+
+
+
+class AvgCon extends StatefulWidget {
+
+  const AvgCon();
+
+  @override
+  AvgConState createState() => AvgConState();
+}
+
+class AvgConState extends State<AvgCon> {
+  List<List<Color>> palette = [
+    [Color.fromRGBO(225, 39, 0, 0.7), Color.fromRGBO(255, 78, 2, 0.7), Color.fromRGBO(254, 120, 39, 0.7), Color.fromRGBO(255, 162, 69, 0.7), Color.fromRGBO(254, 199, 105, 0.7), Color.fromRGBO(254, 220, 139, 0.7), Color(0xff9F2B2B)],
+    [Color.fromRGBO(0, 39, 225, 0.7), Color.fromRGBO(2, 78, 255, 0.7), Color.fromRGBO(39, 120, 254, 0.7), Color.fromRGBO(69, 162, 255, 0.7), Color.fromRGBO(105, 199, 254, 0.7), Color.fromRGBO(139, 220, 254, 0.7), Color(0xff2B2B9F)],
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _getDateDB();
+  }
+
+  Future<List<Map<String, int>>> _getDateDB() async {
+    List<Map<String, int>> newMap = await DaySpecProvider().getDateQuery(
+        '''
+        SELECT dateTime, expenditure, income FROM DaySpecs;
+        ''');
+    return newMap;
+  }
+
+  int maxVal = 0;
+  BezierLine makeLine(int type, DateTime fromDate){
+    List<DataPoint<DateTime>> list = [];
+    DateTime t = fromDate;
+    DateTime now = DateTime.now();
+    now = DateTime(now.year, now.month, now.day);
+    while( t != now ){
+      String s = DateFormat('yy/MM/dd').format(t);
+      if( DateSpecsMap[type].containsKey(s) ){
+        int m = type == 0 ? -1 : 1;
+        maxVal = maxVal > m*DateSpecsMap[type][s]! ? maxVal : m*DateSpecsMap[type][s]!;
+        list.add(DataPoint<DateTime>(value: m * DateSpecsMap[type][s]!.toDouble(), xAxis: t));
+      }
+      t = t.add(const Duration(days: 1));
+    }
+    String s = DateFormat('yy/MM/dd').format(t);
+    if( DateSpecsMap[type].containsKey(s) ){
+      int m = type == 0 ? -1 : 1;
+      list.add(DataPoint<DateTime>(value: m * DateSpecsMap[type][s]!.toDouble(), xAxis: t));
+    }
+    return BezierLine(
+      lineColor: palette[type][2],
+      lineStrokeWidth: 2.0,
+      label: type == 0 ? "지출" : "수입",
+      data: list,
+    );
+  }
+
+  BezierLine makeSumLine(DateTime fromDate){
+    List<DataPoint<DateTime>> list = [];
+    DateTime t = fromDate;
+    DateTime now = DateTime.now();
+    now = DateTime(now.year, now.month, now.day);
+    int sum = 0;
+    while( t != now ){
+      String s = DateFormat('yy/MM/dd').format(t);
+      if( DateSpecsMap[2].containsKey(s) ){
+        sum += DateSpecsMap[2][s]!;
+      }
+      list.add(DataPoint<DateTime>(value: sum.toDouble(), xAxis: t));
+      t = t.add(const Duration(days: 1));
+    }
+    String s = DateFormat('yy/MM/dd').format(t);
+    if( DateSpecsMap[2].containsKey(s) ){
+      sum += DateSpecsMap[2][s]!;
+    }
+    list.add(DataPoint<DateTime>(value: sum.toDouble(), xAxis: t));
+    return BezierLine(
+      lineColor: Color(0x7fafdbbb),
+      lineStrokeWidth: 2.0,
+      label: "합계",
+      data: list,
+    );
+  }
+
+  List<Map<String, int>> DateSpecsMap = [{}, {}, {}];
+
+  Widget sample2(BuildContext context, data) {
+    DateSpecsMap = data;
+    DateTime toDate = DateTime.now();
+    DateTime fromDate = DateTime(toDate.year-1, toDate.month, toDate.day);
+    return Center(
+      child: Container(
+        height: MediaQuery.of(context).size.width * 0.7,
+        width: MediaQuery.of(context).size.width,
+        child: BezierChart(
+          bezierChartScale: BezierChartScale.WEEKLY,
+          fromDate: fromDate,
+          toDate: toDate,
+          selectedDate: toDate,
+          series: [
+            makeSumLine(fromDate),
+            makeLine(0, fromDate),
+            makeLine(1, fromDate),
+          ],
+          config: BezierChartConfig(
+            xAxisTextStyle: TextStyle(color: Colors.black12),
+            displayYAxis: true,
+            yAxisTextStyle: TextStyle(color: Colors.black12),
+            stepsYAxis: 20000,
+            pinchZoom: true,
+            verticalIndicatorStrokeWidth: 2.0,
+            verticalIndicatorColor: Colors.black12,
+            showVerticalIndicator: true,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MyCard(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: 10,),
+          Row(
+            children: [
+              SizedBox(width: 16,),
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text("최근 경향", style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xff205930),
+                      fontWeight: FontWeight.bold,
+                    ),),
+                    const SizedBox(height: 2,),
+                    Text("sadsdasda",
+                      style: TextStyle(
+                          color: Color(0xff419157),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ]
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              SizedBox(width: 8,),
+              Expanded(
+                child: FutureBuilder<List<Map<String, int>>>(
+                  future: _getDateDB(),
+                  initialData: [{}, {}, {}],
+                  builder: (context, snapshot){
+                    //return SizedBox.shrink();
+                    return sample2(context, snapshot.data);
+                  }
+                ),
+              ),
+              SizedBox(width: 8,),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
 
 class TextOutline extends StatelessWidget {
   final String text;

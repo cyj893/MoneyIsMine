@@ -140,18 +140,6 @@ class SpecProvider {
     return list;
   }
 
-  Future<List<List<Pair>>> getWeekQuery(String query) async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
-    if( maps.isEmpty ) return [];
-
-    List<List<Pair>> list = [[], []];
-    for(int i = 0; i < maps.length; i++){
-      list[0].add(Pair(maps[i]["dateTime"], maps[i]["expenditure"] ?? 0));
-      list[1].add(Pair(maps[i]["dateTime"], maps[i]["income"] ?? 0));
-    }
-    return list;
-  }
 }
 
 class DaySpecProvider {
@@ -164,7 +152,6 @@ class DaySpecProvider {
 
   initDB() async {
     String path = join(await getDatabasesPath(), 'DaySpecs.db');
-
     return await openDatabase(
         path,
         version: 1,
@@ -247,6 +234,7 @@ class DaySpecProvider {
   Future<List<List<Pair>>> getAvgQuery(String query) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    print("!!!!!!-----------${maps.length}");
     if( maps.isEmpty ) return [];
 
     List<List<Pair>> list = [[], []];
@@ -267,6 +255,19 @@ class DaySpecProvider {
       list[0][maps[i]["dateTime"]] = maps[i]["expenditure"] ?? 0;
       list[1][maps[i]["dateTime"]] = maps[i]["income"] ?? 0;
       list[2][maps[i]["dateTime"]] = (maps[i]["expenditure"] ?? 0) + (maps[i]["income"] ?? 0);
+    }
+    return list;
+  }
+
+  Future<List<List<Pair>>> getWeekQuery(String query) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    if( maps.isEmpty ) return [[], []];
+
+    List<List<Pair>> list = [[], []];
+    for(int i = 0; i < maps.length; i++){
+      list[0].add(Pair(maps[i]["dateTime"], maps[i]["expenditure"]));
+      list[1].add(Pair(maps[i]["dateTime"], maps[i]["income"]));
     }
     return list;
   }
