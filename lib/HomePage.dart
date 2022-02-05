@@ -7,6 +7,7 @@ import 'DBHelper.dart';
 import 'DaySpecCon.dart';
 import 'BottomNaviBar.dart';
 import 'MyTheme.dart';
+import 'SettingsPage.dart';
 
 class MyHomePage extends StatefulWidget {
 
@@ -35,6 +36,18 @@ class MyHomePageState  extends State<MyHomePage> {
     return Scaffold(
         appBar: AppBar(
           title: Text("홈"),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SettingsPage()
+                      )
+                  ).then(onGoBack);
+                },
+                icon: Icon(Icons.settings_rounded, color: Colors.white,))
+          ],
         ),
         bottomNavigationBar: buildBottomNaviBar(context, onGoBack),
         body: Padding(

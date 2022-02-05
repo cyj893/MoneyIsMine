@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:bezier_chart/bezier_chart.dart';
 import 'package:provider/src/provider.dart';
 import 'DBHelper.dart';
+import 'MyTheme.dart';
 
 class ChartPage extends StatefulWidget {
 
@@ -612,6 +613,7 @@ class AvgCon extends StatefulWidget {
 }
 
 class AvgConState extends State<AvgCon> {
+  List<Color> paletteProvider = [];
   List<List<Color>> palette = [
     [Color.fromRGBO(225, 39, 0, 0.7), Color.fromRGBO(255, 78, 2, 0.7), Color.fromRGBO(254, 120, 39, 0.7), Color.fromRGBO(255, 162, 69, 0.7), Color.fromRGBO(254, 199, 105, 0.7), Color.fromRGBO(254, 220, 139, 0.7), Color(0xff9F2B2B)],
     [Color.fromRGBO(0, 39, 225, 0.7), Color.fromRGBO(2, 78, 255, 0.7), Color.fromRGBO(39, 120, 254, 0.7), Color.fromRGBO(69, 162, 255, 0.7), Color.fromRGBO(105, 199, 254, 0.7), Color.fromRGBO(139, 220, 254, 0.7), Color(0xff2B2B9F)],
@@ -724,6 +726,7 @@ class AvgConState extends State<AvgCon> {
 
   @override
   Widget build(BuildContext context) {
+    paletteProvider = context.watch<ColorProvider>().palette;
     return MyCard(
       child: Column(
         children: <Widget>[
@@ -735,15 +738,15 @@ class AvgConState extends State<AvgCon> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text("최근 경향", style: TextStyle(
+                    Text("최근 경향", style: TextStyle(
                       fontSize: 20,
-                      color: Color(0xff205930),
+                      color: paletteProvider[4],
                       fontWeight: FontWeight.bold,
                     ),),
                     const SizedBox(height: 2,),
                     Text("sadsdasda",
                       style: TextStyle(
-                          color: Color(0xff419157),
+                          color: paletteProvider[3],
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
