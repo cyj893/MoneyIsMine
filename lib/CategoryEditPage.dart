@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'DBHelper.dart';
+import 'MyTheme.dart';
 
 class CategoryEditPage extends StatefulWidget {
 
@@ -9,6 +10,7 @@ class CategoryEditPage extends StatefulWidget {
 }
 
 class CategoryEditPageState extends State<CategoryEditPage> {
+  List<Color> paletteProvider = [];
 
   String pageName = "카테고리 수정";
 
@@ -64,7 +66,7 @@ class CategoryEditPageState extends State<CategoryEditPage> {
             width: 50,
             child: IconButton(
               icon: Icon(Icons.add_rounded),
-              color: Colors.blue,
+              color: paletteProvider[2],
               iconSize: 20.0,
               onPressed: () {
                 if( tempcategoryMap.containsKey(_name.text) ){
@@ -119,7 +121,7 @@ class CategoryEditPageState extends State<CategoryEditPage> {
                     child: Text(tempcategoryMap[tempcategoryNames[i]]!),
                     backgroundColor: Colors.white,
                   ),
-                  backgroundColor: Colors.blue[100],
+                  backgroundColor: paletteProvider[0],
                   label: Text(tempcategoryNames[i]),
                 )
             ),
@@ -127,7 +129,7 @@ class CategoryEditPageState extends State<CategoryEditPage> {
               SizedBox.shrink()
             : IconButton(
               icon: Icon(Icons.delete_forever_rounded),
-              color: Colors.blue,
+              color: paletteProvider[2],
               iconSize: 25.0,
               onPressed: () {
                 setState(() {
@@ -143,6 +145,7 @@ class CategoryEditPageState extends State<CategoryEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    paletteProvider = context.watch<ColorProvider>().palette;
     return Scaffold(
       appBar: AppBar(
         title: Text(pageName),

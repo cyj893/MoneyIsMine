@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
 import 'CalendarPage.dart';
 import 'ChartPage.dart';
 import 'DBHelper.dart';
 import 'InputSpecsPage.dart';
-import 'main.dart';
+import 'HomePage.dart';
+import 'MyTheme.dart';
 
 
 void goHome(BuildContext context, onGoBack){
@@ -45,7 +47,7 @@ void goChartPage(BuildContext context, onGoBack){
 BottomNavigationBar buildBottomNaviBar(BuildContext context, onGoBack){
   return BottomNavigationBar(
     type: BottomNavigationBarType.fixed,
-    backgroundColor: Colors.blue[200],
+    backgroundColor: context.watch<ColorProvider>().palette[1],
     selectedItemColor: Colors.white,
     unselectedItemColor: Colors.white.withOpacity(.60),
     onTap: (int i) {

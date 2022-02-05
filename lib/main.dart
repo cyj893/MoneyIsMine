@@ -1,17 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'DBHelper.dart';
-import 'DaySpecCon.dart';
-import 'BottomNaviBar.dart';
+import 'HomePage.dart';
+import 'MyTheme.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => ColorProvider()),
       ],
       child: MyApp(),
     ),
@@ -26,174 +24,25 @@ class MyApp extends StatelessWidget {
     context.read<CategoryProvider>().init();
     print(context.read<CategoryProvider>().categories);
     return MaterialApp(
+      theme: ThemeData(
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme(
+            primary: context.watch<ColorProvider>().palette[3],
+            primaryVariant: context.watch<ColorProvider>().palette[3],
+            secondary: context.watch<ColorProvider>().palette[2],
+            secondaryVariant: context.watch<ColorProvider>().palette[2],
+            surface: context.watch<ColorProvider>().palette[3],
+            background: Colors.white,
+            error: context.watch<ColorProvider>().palette[3],
+            onPrimary: Colors.white,
+            onSecondary: Colors.white,
+            onSurface: context.watch<ColorProvider>().palette[3],
+            onBackground: context.watch<ColorProvider>().palette[3],
+            onError: context.watch<ColorProvider>().palette[3],
+            brightness: Brightness.light),
+      ),
       title: 'main',
       home: MyHomePage(),
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-
-  const MyHomePage();
-
-  @override
-  MyHomePageState createState() => MyHomePageState();
-}
-
-class MyHomePageState  extends State<MyHomePage> {
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    initializeDateFormatting(Localizations.localeOf(context).languageCode);
-  }
-
-  FutureOr onGoBack(dynamic value) {
-    setState(() {
-      print("onGoBack");
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'main',
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text("main"),
-          ),
-          bottomNavigationBar: buildBottomNaviBar(context, onGoBack),
-          body: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  DaySpecCon(DateFormat('yy/MM/dd').format(DateTime.now())),
-                  Divider(),
-                  MonthSummaryCon(),
-                ],
-              ),
-            )
-          )
-          ),
-    );
-  }
-
-}
-
-
-
-class MonthSummaryCon extends StatefulWidget {
-
-  const MonthSummaryCon();
-
-  @override
-  MonthSummaryConState createState() => MonthSummaryConState();
-}
-
-class MonthSummaryConState extends State<MonthSummaryCon> {
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
-  List<int> monthSummary = [0, 0, 0];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  FutureOr onGoBack(dynamic value) {
-    setState(() {
-      print("onGoBack");
-    });
-  }
-
-  Future<List<int>> _getSummaryQuery() async {
-    String month = DateFormat('yy/MM/').format(DateTime.now());
-    List<int> newlist = await SpecProvider().getSummaryQuery(
-        '''
-        SELECT SUM(CASE WHEN type=0 THEN money END) as 'expenditure',
-               SUM(CASE WHEN type=1 THEN money END) as 'income'
-        FROM Specs
-        WHERE dateTime BETWEEN '${month+"01"}' AND '${month+"31"}' ;
-        ''');
-    print("---------------${month+"01"} ~ ${month+"31"}");
-    newlist.add(newlist[0] + newlist[1]);
-    print(newlist);
-    monthSummary = newlist;
-    return newlist;
-  }
-
-  List<Widget> makeMonthSummary() {
-    int p = monthSummary[1], m = monthSummary[0], sum = monthSummary[2];
-    List<Widget> list = [];
-    list.add(Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Expanded(child: Text("수입", textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),)),
-        Expanded(child: Text("지출", textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),)),
-        Expanded(child: Text("합계", textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),)),
-      ],
-    ));
-    list.add(Divider());
-    list.add(Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-            child: Text("${_formatNumber(p.toString().replaceAll(',', ''))} 원",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.blue),)),
-        Expanded(child: Text(
-          "${_formatNumber((-m).toString().replaceAll(',', ''))} 원",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, color: Colors.orange),)),
-        Expanded(child: Text(
-          "${_formatNumber(sum.toString().replaceAll(',', ''))} 원",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 16, color: sum >= 0 ? Colors.blue : Colors.orange),)),
-      ],
-    ));
-    return list;
-  }
-
-  Container makeMonthCon() {
-    return Container(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-        decoration: BoxDecoration(
-          border: Border.all(color: (Colors.blue[100])!, width: 4),
-          borderRadius: BorderRadius.all(
-              Radius.circular(20.0)
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Chip(
-              backgroundColor: Colors.blue[200],
-              label: Text(
-                DateFormat('yy/MM').format(DateTime.now()),
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
-            ),
-            Column(
-                children: makeMonthSummary()
-            )
-          ],
-        )
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<int>>(
-      future: _getSummaryQuery(),
-      initialData: [],
-      builder: (context, snapshot) {
-        return makeMonthCon();
-      },);
-
   }
 }

@@ -7,6 +7,7 @@ import 'package:numberpicker/numberpicker.dart';
 import 'dart:io';
 import 'CategoryEditPage.dart';
 import 'DBHelper.dart';
+import 'MyTheme.dart';
 
 class InputSpecsPage extends StatefulWidget {
   final Spec nowInstance;
@@ -18,6 +19,8 @@ class InputSpecsPage extends StatefulWidget {
 }
 
 class InputSpecsPageState extends State<InputSpecsPage> {
+  List<Color> paletteProvider = [];
+
   String pageName = "내역 추가";
   bool isUpdateLoaded = false;
 
@@ -176,6 +179,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   List<Widget> initTypes(int index){
     return <Widget>[
       Checkbox(
+        activeColor: paletteProvider[1],
           value: typebools[index],
           onChanged: (bool? value) {
             setState(() {
@@ -207,6 +211,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   List<Widget> initMethods(int index){
     return <Widget>[
       Checkbox(
+        activeColor: paletteProvider[1],
           value: methodbools[index],
           onChanged: (bool? value) {
             setState(() {
@@ -247,7 +252,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                   child: categorybools[i] ? Text("\u{2714}") : Text(categoryMap[categoryNames[i]]!),
                   backgroundColor: Colors.white,
                 ),
-                backgroundColor: categorybools[i] ? Colors.blueAccent : Colors.blue[100],
+                backgroundColor: categorybools[i] ? paletteProvider[3] : paletteProvider[0],
                 label: categorybools[i] ? Text(categoryNames[i], style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),) : Text(categoryNames[i]),
               ),
           onTap: () {
@@ -291,7 +296,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                         );
                       },
                       icon: Icon(Icons.format_list_bulleted_rounded),
-                      color: Colors.blue[300],
+                      color: paletteProvider[1],
                     ),
                   ]
               )
@@ -456,7 +461,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                               child: Chip(
                                 label: Text(mw == 0 ? "매월" : "매주",
                                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                backgroundColor: Colors.blue[300],
+                                backgroundColor: paletteProvider[1],
                               ),
                             ),
                             SizedBox(width: 10,),
@@ -489,14 +494,14 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                                                       Navigator.pop(context);
                                                     },
                                                     child: Chip(
-                                                      label: Text(mwArr[mw][index],),
-                                                      backgroundColor: mwBoolArr[mw][index] ? Colors.blue[300] : Colors.blue[100],
+                                                      label: Text(mwArr[mw][index], style: TextStyle(color: mwBoolArr[mw][index] ? Colors.white : Colors.black, fontWeight: mwBoolArr[mw][index] ? FontWeight.bold : FontWeight.normal),),
+                                                      backgroundColor: mwBoolArr[mw][index] ? paletteProvider[3] : paletteProvider[0],
                                                     ))),
                                               ),
                                             );
                                           });
                                         },
-                                        icon: Icon(Icons.add_circle_outline_rounded, color: Colors.blue[300],)),
+                                        icon: Icon(Icons.add_circle_outline_rounded, color: paletteProvider[1],)),
                                   ],
                                 ),
                               ),
@@ -509,6 +514,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             NumberPicker(
+                                selectedTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: paletteProvider[3]),
                                 minValue: 1,
                                 maxValue: 100,
                                 value: repeatVal,
@@ -551,7 +557,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                     else _controller.previousPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
                   },
                   icon: nowPage == 0 ? const Icon(Icons.arrow_forward_ios_rounded) : const Icon(Icons.arrow_back_ios_rounded),
-                  color: Colors.blue[200],),
+                  color: paletteProvider[1],),
               ],
             ),
           ),
@@ -586,7 +592,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                           ),
                           IconButton(
                               onPressed: () { showFixedDialog(); },
-                              icon: Icon(Icons.edit_rounded, color: Colors.blue[300],))
+                              icon: Icon(Icons.edit_rounded, color: paletteProvider[1],))
                         ],
                       )
                   ),
@@ -633,7 +639,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
           if( index == 0 ) {
             return IconButton(
                 iconSize: 25,
-                icon: Icon(Icons.add_circle, color: Colors.blue[200],),
+                icon: Icon(Icons.add_circle, color: paletteProvider[1],),
                 onPressed: () async {
                   List<XFile>? images = await picker.pickMultiImage();
                   if( images != null ){
@@ -698,6 +704,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   @override
   Widget build(BuildContext context) {
+    paletteProvider = context.watch<ColorProvider>().palette;
     categoryNames = context.watch<CategoryProvider>().categories;
     categoryMap = context.watch<CategoryProvider>().map;
     for(int i = 0; i < categoryNames.length; i++){

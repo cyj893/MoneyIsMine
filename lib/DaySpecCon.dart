@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/src/provider.dart';
 import 'InputSpecsPage.dart';
 import 'DBHelper.dart';
+import 'MyTheme.dart';
 import 'SpecPage.dart';
 
 class DaySpecCon extends StatefulWidget {
@@ -16,6 +18,7 @@ class DaySpecCon extends StatefulWidget {
 }
 
 class DaySpecConState extends State<DaySpecCon> {
+  List<Color> paletteProvider = [];
   String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
   List<Spec> _daySpecs = [];
 
@@ -117,7 +120,7 @@ class DaySpecConState extends State<DaySpecCon> {
     }
     list.add(IconButton(
       iconSize: 25,
-      icon: Icon(Icons.add_circle, color: Colors.blue[200],),
+      icon: Icon(Icons.add_circle, color: paletteProvider[1],),
       onPressed: () {
         Navigator.push(
             context,
@@ -134,7 +137,7 @@ class DaySpecConState extends State<DaySpecCon> {
   ExpansionTile makeDayExpTile() {
     return ExpansionTile(
       title: Chip(
-        backgroundColor: Colors.blue[200],
+        backgroundColor: paletteProvider[1],
         label: Text(
           "${widget.date} (${DateFormat.E('ko_KR').format(DateFormat("yy/MM/dd").parse(widget.date))})",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
@@ -192,7 +195,7 @@ class DaySpecConState extends State<DaySpecCon> {
     return Container(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         decoration: BoxDecoration(
-          border: Border.all(color: (Colors.blue[100])!, width: 4),
+          border: Border.all(color: paletteProvider[0], width: 4),
           borderRadius: BorderRadius.all(
               Radius.circular(20.0)
           ),
@@ -211,6 +214,7 @@ class DaySpecConState extends State<DaySpecCon> {
 
   @override
   Widget build(BuildContext context) {
+    paletteProvider = context.watch<ColorProvider>().palette;
     return FutureBuilder<List<Spec>>(
           future: _getDayQuery(),
           initialData: <Spec>[],

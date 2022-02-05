@@ -694,7 +694,7 @@ class AvgConState extends State<AvgCon> {
     DateTime fromDate = DateTime(toDate.year-1, toDate.month, toDate.day);
     return Center(
       child: Container(
-        height: MediaQuery.of(context).size.width * 0.7,
+        height: MediaQuery.of(context).size.width,
         width: MediaQuery.of(context).size.width,
         child: BezierChart(
           bezierChartScale: BezierChartScale.WEEKLY,
@@ -707,6 +707,7 @@ class AvgConState extends State<AvgCon> {
             makeLine(1, fromDate),
           ],
           config: BezierChartConfig(
+            footerHeight: 50,
             xAxisTextStyle: TextStyle(color: Colors.black12),
             displayYAxis: true,
             yAxisTextStyle: TextStyle(color: Colors.black12),
@@ -752,7 +753,6 @@ class AvgConState extends State<AvgCon> {
           ),
           Row(
             children: [
-              SizedBox(width: 8,),
               Expanded(
                 child: FutureBuilder<List<Map<String, int>>>(
                   future: _getDateDB(),
@@ -763,7 +763,6 @@ class AvgConState extends State<AvgCon> {
                   }
                 ),
               ),
-              SizedBox(width: 8,),
             ],
           ),
         ],
