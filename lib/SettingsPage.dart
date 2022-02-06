@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:money_is_mine/MyTheme.dart';
+import 'db_helper/ColorProvider.dart';
 import 'package:provider/src/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -64,7 +64,7 @@ class SettingsPageState  extends State<SettingsPage> {
   ExpansionTile makeColorSelect(){
     return ExpansionTile(
       title: Text("색상"),
-        children: [makePalette(0),makePalette(1),],
+        children: List.generate(allPalette.length, (index) => makePalette(index)),
     );
   }
 

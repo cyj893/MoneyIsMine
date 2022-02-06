@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'DBHelper.dart';
+import 'db_helper/DBHelper.dart';
 import 'HomePage.dart';
-import 'MyTheme.dart';
+import 'db_helper/ColorProvider.dart';
 
 void main() {
   runApp(
@@ -21,24 +21,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Color> paletteProvider = context.watch<ColorProvider>().palette;
     context.read<CategoryProvider>().init();
     print(context.read<CategoryProvider>().categories);
     return MaterialApp(
       theme: ThemeData(
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        unselectedWidgetColor: paletteProvider[1],
         colorScheme: ColorScheme(
-            primary: context.watch<ColorProvider>().palette[3],
-            primaryVariant: context.watch<ColorProvider>().palette[3],
-            secondary: context.watch<ColorProvider>().palette[2],
-            secondaryVariant: context.watch<ColorProvider>().palette[2],
-            surface: context.watch<ColorProvider>().palette[3],
+            primary: paletteProvider[3],
+            primaryVariant: paletteProvider[3],
+            secondary: paletteProvider[2],
+            secondaryVariant: paletteProvider[2],
+            surface: paletteProvider[3],
             background: Colors.white,
-            error: context.watch<ColorProvider>().palette[3],
+            error: paletteProvider[3],
             onPrimary: Colors.white,
             onSecondary: Colors.white,
-            onSurface: context.watch<ColorProvider>().palette[3],
-            onBackground: context.watch<ColorProvider>().palette[3],
-            onError: context.watch<ColorProvider>().palette[3],
+            onSurface: paletteProvider[3],
+            onBackground: paletteProvider[3],
+            onError: paletteProvider[3],
             brightness: Brightness.light),
       ),
       title: 'main',

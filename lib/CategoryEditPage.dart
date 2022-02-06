@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'DBHelper.dart';
-import 'MyTheme.dart';
+import 'db_helper/DBHelper.dart';
+import 'db_helper/ColorProvider.dart';
 
 class CategoryEditPage extends StatefulWidget {
 

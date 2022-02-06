@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
-import 'DBHelper.dart';
+import 'db_helper/DBHelper.dart';
 import 'DaySpecCon.dart';
 import 'BottomNaviBar.dart';
-import 'MyTheme.dart';
+import 'db_helper/ColorProvider.dart';
 import 'SettingsPage.dart';
 
 class MyHomePage extends StatefulWidget {

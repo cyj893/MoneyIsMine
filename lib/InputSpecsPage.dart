@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'dart:io';
 import 'CategoryEditPage.dart';
-import 'DBHelper.dart';
-import 'MyTheme.dart';
+import 'db_helper/DBHelper.dart';
+import 'db_helper/ColorProvider.dart';
 
 class InputSpecsPage extends StatefulWidget {
   final Spec nowInstance;

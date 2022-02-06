@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 import 'package:scrolling_page_indicator/scrolling_page_indicator.dart';
-import 'DBHelper.dart';
+import 'db_helper/DBHelper.dart';
 import 'InputSpecsPage.dart';
 
 class SpecPage extends StatefulWidget {
