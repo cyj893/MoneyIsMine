@@ -1,6 +1,6 @@
-export 'SpecProvider.dart';
-export 'DaySpecProvider.dart';
-export 'PicProvider.dart';
+export 'SpecDBHelper.dart';
+export 'DaySpecDBHelper.dart';
+export 'PicDBHelper.dart';
 export 'CategoryProvider.dart';
 export 'models/SpecModel.dart';
 export 'models/PictureModel.dart';

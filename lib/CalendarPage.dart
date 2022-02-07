@@ -28,7 +28,7 @@ class CalendarPageState extends State<CalendarPage> {
   }
 
   Future<List<Map<String, int>>> _getSumQuery() async {
-    List<Map<String, int>> newMap = await DaySpecProvider().getDateQuery(
+    List<Map<String, int>> newMap = await DaySpecDBHelper().getDateQuery(
         '''
         SELECT dateTime, expenditure, income FROM DaySpecs;
         ''');

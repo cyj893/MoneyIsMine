@@ -5,6 +5,8 @@ import 'HomePage.dart';
 import 'db_helper/ColorProvider.dart';
 
 void main() {
+  SpecDBHelper();
+  DaySpecDBHelper();
   runApp(
     MultiProvider(
       providers: [

@@ -3,22 +3,20 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'models/PictureModel.dart';
 
-class PicProvider {
-  static PicProvider _picProvider = PicProvider._internal();
-  PicProvider._internal();
-  factory PicProvider() {
+class PicDBHelper {
+  static final PicDBHelper _picProvider = PicDBHelper._internal();
+  PicDBHelper._internal();
+  factory PicDBHelper() {
     return _picProvider;
   }
 
-  static late Database _database;
+  static Database? _database;
   final String tableName = 'Pics';
+  
+  Future<Database> get database async => _database ??= await initDB();
 
-  Future<Database?> get database async {
-    _database = await initDB();
-    return _database;
-  }
-
-  initDB() async {
+  Future<Database> initDB() async {
+    print("Pic Helper");
     String path = join(await getDatabasesPath(), 'Pics.db');
     return await openDatabase(
         path,
@@ -39,13 +37,13 @@ class PicProvider {
   Future<void> insert(Picture pic) async {
     final db = await database;
     print("Pics insert ${pic.specID}");
-    pic.id = await db?.insert(tableName, pic.toMap());
+    pic.id = await db.insert(tableName, pic.toMap());
   }
 
   Future<void> delete(Picture pic) async {
     final db = await database;
     print("Pics delete ${pic.specID}");
-    await db?.delete(
+    await db.delete(
       tableName,
       where: "id = ?",
       whereArgs: [pic.id],
@@ -55,7 +53,7 @@ class PicProvider {
   Future<void> deleteSpec(int specID) async {
     final db = await database;
     print("Pics delete all ${specID}");
-    await db?.delete(
+    await db.delete(
       tableName,
       where: "specID = ?",
       whereArgs: [specID],
@@ -64,7 +62,7 @@ class PicProvider {
 
   Future<List<Picture>> getDB() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.query(tableName);
+    final List<Map<String, dynamic>> maps = await db.query(tableName);
     if( maps.isEmpty ) return [];
     List<Picture> list = List.generate(maps.length, (index) {
       return Picture(
@@ -78,7 +76,7 @@ class PicProvider {
 
   Future<List<Picture>> getQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return [];
     List<Picture> list = List.generate(maps.length, (index) {
       return Picture(

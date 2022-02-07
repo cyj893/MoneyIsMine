@@ -95,7 +95,7 @@ class MonthSummaryConState extends State<MonthSummaryCon> {
 
   Future<List<int>> _getSummaryQuery() async {
     String month = DateFormat('yy/MM/').format(DateTime.now());
-    List<int> newlist = await SpecProvider().getSummaryQuery(
+    List<int> newlist = await SpecDBHelper().getSummaryQuery(
         '''
         SELECT SUM(CASE WHEN type=0 THEN money END) as 'expenditure',
                SUM(CASE WHEN type=1 THEN money END) as 'income'

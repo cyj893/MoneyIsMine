@@ -65,7 +65,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
 
   Future<List<Picture>> _getPicDB(int i) async {
-    List<Picture> newlist = await PicProvider().getQuery(
+    List<Picture> newlist = await PicDBHelper().getQuery(
       '''
       SELECT * FROM Pics
       WHERE specID = ${i}
@@ -139,9 +139,9 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     String cate = c == -1 ? "기타" : categoryNames[c];  // set to default
     final ctxt = contents.text.isEmpty ? "." : contents.text;
     final mtxt = memo.text.isEmpty ? "." : memo.text;
-    var provider = SpecProvider();
-    var dayProvider = DaySpecProvider();
-    var picProvider = PicProvider();
+    var provider = SpecDBHelper();
+    var dayProvider = DaySpecDBHelper();
+    var picProvider = PicDBHelper();
 
     int pm = t == 0 ? -1 : 1;
     var spec = Spec(

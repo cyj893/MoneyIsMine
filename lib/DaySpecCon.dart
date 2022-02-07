@@ -37,7 +37,7 @@ class DaySpecConState extends State<DaySpecCon> {
     String yy = widget.date.substring(0, 2);
     String MM = widget.date.substring(3, 5);
     String dd = widget.date.substring(6, 8);
-    List<Spec> newList = await SpecProvider().getQuery(
+    List<Spec> newList = await SpecDBHelper().getQuery(
         '''
         SELECT * FROM Specs
         WHERE dateTime = '$yy\/$MM\/$dd'
@@ -62,9 +62,9 @@ class DaySpecConState extends State<DaySpecCon> {
                   child: Text("no")),
               TextButton(
                   onPressed: () {
-                    SpecProvider().delete(spec);
-                    DaySpecProvider().delete(spec);
-                    PicProvider().deleteSpec(spec.id!);
+                    SpecDBHelper().delete(spec);
+                    DaySpecDBHelper().delete(spec);
+                    PicDBHelper().deleteSpec(spec.id!);
                     _daySpecs.removeWhere((item) => item.id == spec.id);
                     Navigator.of(context).pop();
                     onGoBack(null);

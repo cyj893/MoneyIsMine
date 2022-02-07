@@ -4,22 +4,20 @@ import 'package:sqflite/sqflite.dart';
 import 'Pair.dart';
 import 'models/SpecModel.dart';
 
-class SpecProvider {
-  static SpecProvider _specProvider = SpecProvider._internal();
-  SpecProvider._internal();
-  factory SpecProvider() {
-    return _specProvider;
+class SpecDBHelper {
+  static final SpecDBHelper _specDBHelper = SpecDBHelper._internal();
+  SpecDBHelper._internal();
+  factory SpecDBHelper() {
+    return _specDBHelper;
   }
 
-  static late Database _database;
+  static Database? _database;
   final String tableName = 'Specs';
 
-  Future<Database?> get database async {
-    _database = await initDB();
-    return _database;
-  }
+  Future<Database> get database async => _database ??= await initDB();
 
-  initDB() async {
+  Future<Database> initDB() async {
+    print("Spec Helper");
     String path = join(await getDatabasesPath(), 'Specs.db');
     return await openDatabase(
         path,
@@ -45,14 +43,14 @@ class SpecProvider {
   Future<int?> insert(Spec spec) async {
     final db = await database;
     print("Specs insert ${spec.type} ${spec.category} ${spec.method} ${spec.contents} ${spec.money} ${spec.dateTime} ${spec.memo}");
-    spec.id = await db?.insert(tableName, spec.toMap());
+    spec.id = await db.insert(tableName, spec.toMap());
     return spec.id;
   }
 
   Future<void> update(Spec spec) async {
     final db = await database;
     print("Specs update ${spec.type} ${spec.category} ${spec.method} ${spec.contents} ${spec.money} ${spec.dateTime} ${spec.memo}");
-    await db?.update(
+    await db.update(
       tableName,
       spec.toMap(),
       where: "id = ?",
@@ -63,7 +61,7 @@ class SpecProvider {
   Future<void> delete(Spec spec) async {
     final db = await database;
     print("Specs delete ${spec.type} ${spec.category} ${spec.method} ${spec.contents} ${spec.money} ${spec.dateTime} ${spec.memo}");
-    await db?.delete(
+    await db.delete(
       tableName,
       where: "id = ?",
       whereArgs: [spec.id],
@@ -72,7 +70,7 @@ class SpecProvider {
 
   Future<List<Spec>> getDB() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.query(tableName);
+    final List<Map<String, dynamic>> maps = await db.query(tableName);
     if( maps.isEmpty ) return [];
     List<Spec> list = List.generate(maps.length, (index) {
       return Spec(
@@ -91,7 +89,7 @@ class SpecProvider {
 
   Future<List<Spec>> getQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return [];
     List<Spec> list = List.generate(maps.length, (index) {
       return Spec(
@@ -110,7 +108,7 @@ class SpecProvider {
 
   Future<Map<String, int>> getSumQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return {};
 
     Map<String, int> map = {};
@@ -122,7 +120,7 @@ class SpecProvider {
 
   Future<List<Pair>> getCategorySumQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return [];
 
     List<Pair> list = [];
@@ -134,7 +132,7 @@ class SpecProvider {
 
   Future<List<int>> getSummaryQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return [0, 0];
 
     List<int> list = [];

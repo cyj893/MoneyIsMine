@@ -146,7 +146,7 @@ class CategorySumConState extends State<CategorySumCon> {
     DateTime now = DateTime.now();
     monthDate.add(DateFormat('yy/MM/').format(now)+"01");
     monthDate.add(DateFormat('yy/MM/dd').format(DateTime(now.year, now.month + 1, 0)));
-    List<Pair> newList = await SpecProvider().getCategorySumQuery(
+    List<Pair> newList = await SpecDBHelper().getCategorySumQuery(
         '''
         SELECT category, SUM(money) FROM Specs
         WHERE type = 0 AND dateTime BETWEEN '${monthDate[0]}' AND '${monthDate[1]}'
@@ -337,7 +337,7 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
       weekDate.add(DateFormat('yy/MM/dd').format(date.subtract(Duration(days: date.weekday - 1 - i))));
     }
     print("${weekDate[0]} ~ ${weekDate[6]}");
-    List<List<Pair>> newList = await DaySpecProvider().getWeekQuery(
+    List<List<Pair>> newList = await DaySpecDBHelper().getWeekQuery(
         '''
         SELECT expenditure,
                income,
@@ -626,7 +626,7 @@ class AvgConState extends State<AvgCon> {
   }
 
   Future<List<Map<String, int>>> _getDateDB() async {
-    List<Map<String, int>> newMap = await DaySpecProvider().getDateQuery(
+    List<Map<String, int>> newMap = await DaySpecDBHelper().getDateQuery(
         '''
         SELECT dateTime, expenditure, income FROM DaySpecs;
         ''');

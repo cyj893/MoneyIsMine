@@ -4,22 +4,20 @@ import 'package:sqflite/sqflite.dart';
 import 'Pair.dart';
 import 'models/SpecModel.dart';
 
-class DaySpecProvider {
-  static DaySpecProvider _daySpecProvider = DaySpecProvider._internal();
-  DaySpecProvider._internal();
-  factory DaySpecProvider() {
+class DaySpecDBHelper {
+  static final DaySpecDBHelper _daySpecProvider = DaySpecDBHelper._internal();
+  DaySpecDBHelper._internal();
+  factory DaySpecDBHelper() {
     return _daySpecProvider;
   }
 
-  static late Database _database;
+  static Database? _database;
   final String tableName = 'DaySpecs';
 
-  Future<Database?> get database async {
-    _database = await initDB();
-    return _database;
-  }
+  Future<Database> get database async => _database ??= await initDB();
 
-  initDB() async {
+  Future<Database> initDB() async {
+    print("DaySpec Helper");
     String path = join(await getDatabasesPath(), 'DaySpecs.db');
     return await openDatabase(
         path,
@@ -41,7 +39,7 @@ class DaySpecProvider {
   Future<void> insert(Spec spec, int day) async {
     final db = await database;
 
-    final List<Map<String, dynamic>> maps = await db!.query(
+    final List<Map<String, dynamic>> maps = await db.query(
         tableName,
         where: "dateTime = ?",
         whereArgs: [spec.dateTime]);
@@ -85,7 +83,7 @@ class DaySpecProvider {
   Future<void> delete(Spec spec) async {
     final db = await database;
 
-    final List<Map<String, dynamic>> maps = await db!.query(
+    final List<Map<String, dynamic>> maps = await db.query(
         tableName,
         where: "dateTime = ?",
         whereArgs: [spec.dateTime]);
@@ -109,7 +107,7 @@ class DaySpecProvider {
 
   Future<List<List<Pair>>> getAvgQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return [];
 
     List<List<Pair>> list = [[], []];
@@ -122,7 +120,7 @@ class DaySpecProvider {
 
   Future<List<Map<String, int>>> getDateQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return [{}, {}, {}];
 
     List<Map<String, int>> list = [{}, {}, {}];
@@ -136,7 +134,7 @@ class DaySpecProvider {
 
   Future<List<List<Pair>>> getWeekQuery(String query) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db!.rawQuery(query);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query);
     if( maps.isEmpty ) return [[], []];
 
     List<List<Pair>> list = [[], []];

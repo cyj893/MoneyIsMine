@@ -47,7 +47,7 @@ class SpecPageState extends State<SpecPage> {
   }
 
   Future<List<Picture>> _getPicDB(int i) async {
-    List<Picture> newlist = await PicProvider().getQuery(
+    List<Picture> newlist = await PicDBHelper().getQuery(
         '''
       SELECT * FROM Pics
       WHERE specID = ${i}
