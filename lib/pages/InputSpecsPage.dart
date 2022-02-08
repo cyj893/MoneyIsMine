@@ -2,12 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:money_is_mine/pages/widgets/CustomButton.dart';
 import 'package:provider/provider.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'dart:io';
 import 'CategoryEditPage.dart';
-import 'db_helper/DBHelper.dart';
-import 'db_helper/ColorProvider.dart';
+import '../db_helper/DBHelper.dart';
+import '../db_helper/ColorProvider.dart';
 
 class InputSpecsPage extends StatefulWidget {
   final Spec nowInstance;
@@ -747,32 +748,3 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
 }
 
-class CustomButton extends StatelessWidget{
-  final String text;
-  final Color textColor;
-  final Function onTap;
-
-  const CustomButton({
-    Key? key,
-    required this.text,
-    required this.onTap,
-    this.textColor = Colors.blue,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onTap();
-      },
-      child: Chip(
-        shape: RoundedRectangleBorder(
-          side: BorderSide(color: Colors.grey[200]!, width: 1.5),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        backgroundColor: Colors.white,
-        label: Text(text, style: TextStyle(color: textColor,),),
-      ),);
-  }
-
-}

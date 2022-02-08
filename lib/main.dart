@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'db_helper/DBHelper.dart';
-import 'HomePage.dart';
+import 'pages/HomePage.dart';
 import 'db_helper/ColorProvider.dart';
 
 void main() {

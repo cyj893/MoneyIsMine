@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 import 'InputSpecsPage.dart';
-import 'db_helper/DBHelper.dart';
-import 'db_helper/ColorProvider.dart';
+import '../db_helper/DBHelper.dart';
+import '../db_helper/ColorProvider.dart';
 import 'SpecPage.dart';
 
 class DaySpecCon extends StatefulWidget {

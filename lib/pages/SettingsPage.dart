@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'db_helper/ColorProvider.dart';
+import '../db_helper/ColorProvider.dart';
 import 'package:provider/src/provider.dart';
 
 class SettingsPage extends StatefulWidget {
