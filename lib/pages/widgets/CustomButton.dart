@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget{
     Key? key,
     required this.text,
     required this.onTap,
-    this.textColor = Colors.blue,
+    this.textColor = Colors.black87,
   }) : super(key: key);
 
   @override

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
+
 import '../db_helper/DBHelper.dart';
+import '../db_helper/ColorProvider.dart';
 import 'CalendarPage.dart';
 import 'ChartPage.dart';
 import 'InputSpecsPage.dart';
 import 'HomePage.dart';
-import '../db_helper/ColorProvider.dart';
+import 'SearchPage.dart';
 
 
 void goHome(BuildContext context, onGoBack){
@@ -22,6 +24,15 @@ void goInputSpecsPage(BuildContext context, onGoBack){
       context,
       MaterialPageRoute(
           builder: (context) => InputSpecsPage(Spec(type: -1, money: 0))
+      )
+  ).then(onGoBack);
+}
+
+void goSearchPage(BuildContext context, onGoBack){
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SearchPage()
       )
   ).then(onGoBack);
 }
@@ -53,7 +64,7 @@ BottomNavigationBar buildBottomNaviBar(BuildContext context, onGoBack){
     onTap: (int i) {
       if( i == 0 ) ;
       else if( i == 1 ) goInputSpecsPage(context, onGoBack);
-      else if( i == 2 ) goInputSpecsPage(context, onGoBack);
+      else if( i == 2 ) goSearchPage(context, onGoBack);
       else if( i == 3 ) goCalendarPage(context, onGoBack);
       else if( i == 4 ) goChartPage(context, onGoBack);
     },

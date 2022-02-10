@@ -352,12 +352,12 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         SizedBox(height: 10,),
         Row(
           children: [
-            CustomButton( onTap: () { addMoney(1000); }, text: "+1천", ),
-            CustomButton( onTap: () { addMoney(5000); }, text: "+5천", ),
-            CustomButton( onTap: () { addMoney(10000); }, text: "+1만", ),
-            CustomButton( onTap: () { addMoney(50000); }, text: "+5만", ),
-            CustomButton( onTap: () { addMoney(100000); }, text: "+10만", ),
-            CustomButton( onTap: () { addMoney(1000000); }, text: "+100만", ),
+            CustomButton( onTap: () { addMoney(1000); }, text: "+1천", textColor: paletteProvider[3], ),
+            CustomButton( onTap: () { addMoney(5000); }, text: "+5천", textColor: paletteProvider[3], ),
+            CustomButton( onTap: () { addMoney(10000); }, text: "+1만", textColor: paletteProvider[3], ),
+            CustomButton( onTap: () { addMoney(50000); }, text: "+5만", textColor: paletteProvider[3], ),
+            CustomButton( onTap: () { addMoney(100000); }, text: "+10만", textColor: paletteProvider[3], ),
+            CustomButton( onTap: () { addMoney(1000000); }, text: "+100만", textColor: paletteProvider[3], ),
           ],
         )
       ],

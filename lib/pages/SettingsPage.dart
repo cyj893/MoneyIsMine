@@ -54,7 +54,7 @@ class SettingsPageState  extends State<SettingsPage> {
               }
             }
           },
-          icon: Icon(Icons.save_rounded, color: allPalette[nowColorIndex][2],)),);
+          icon: Icon(Icons.save_rounded, color: paletteProvider[2],)),);
     }
     return Row(
       children: list,
@@ -74,7 +74,6 @@ class SettingsPageState  extends State<SettingsPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text("설정"),
-          backgroundColor: allPalette[nowColorIndex][3],
         ),
         body: Padding(
             padding: EdgeInsets.all(8.0),
