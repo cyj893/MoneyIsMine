@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:money_is_mine/db_helper/CategoryProvider.dart';
+import 'package:money_is_mine/db_helper/DBHelper.dart';
 import 'package:provider/src/provider.dart';
 import 'package:money_is_mine/pages/widgets/CustomButton.dart';
 import 'package:money_is_mine/db_helper/ColorProvider.dart';
@@ -15,6 +18,7 @@ class SearchPageState  extends State<SearchPage> {
   List<Color> paletteProvider = [];
 
   List<DateTime> dateRange = [DateTime.now().subtract(Duration(days: 7)), DateTime.now()];
+  List<Spec> _resSpecs = [];
 
   Future<void> _selectDate(BuildContext context, int i) async {
     final DateTime? picked = await showDatePicker(
@@ -30,7 +34,7 @@ class SearchPageState  extends State<SearchPage> {
           });
         }
         else{
-
+          // Todo: Toast
         }
       }
       else if( i == 1 ){
@@ -40,7 +44,7 @@ class SearchPageState  extends State<SearchPage> {
           });
         }
         else{
-
+          // Todo: Toast
         }
       }
     }
@@ -64,6 +68,8 @@ class SearchPageState  extends State<SearchPage> {
       ],
     );
   }
+
+  List<String> categoryNames = ["기타"];
 
   List<List<String>> conditions = [
     ["지출/수입", "지출", "수입"],
@@ -117,20 +123,87 @@ class SearchPageState  extends State<SearchPage> {
           },
         ).then((value) { setState(() { }); });
       },
-      child: Text(conditions[ind][conditionNum[ind]]),
+      child: Row(
+        children: [
+          SizedBox(width: 10,),
+          Text(conditions[ind][conditionNum[ind]]),
+          Expanded(child: Container()),
+          Icon(Icons.expand_more_rounded, color: paletteProvider[2],),
+          SizedBox(width: 10,),
+        ],
+      ),
     );
   }
 
   Row makeOthers(){
     return Row(
       children: [
-        SizedBox(width: 8,),
-        Expanded(child: Center(child: makeCondition(0),),),
-        Expanded(child: Center(child: makeCondition(1),),),
-        Expanded(child: Center(child: makeCondition(2),),),
-        SizedBox(width: 8,),
+        Expanded(child: makeCondition(0),),
+        Expanded(child: makeCondition(1),),
+        Expanded(child: makeCondition(2),),
       ],
     );
+  }
+
+  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
+  final money = TextEditingController();
+  bool isMoneyFocused = false;
+  FocusNode focusNode = FocusNode();
+
+  Row makeMoneyAndSearch(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox(
+          width: 200,
+          child: TextField(
+            controller: money,
+            focusNode: focusNode,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              hintText: "금액을 입력하세요",
+              isDense: true,
+              suffixText: "\₩",
+            ),
+            onChanged: (string) {
+              if( string.isEmpty ) return ;
+              string = _formatNumber(string.replaceAll(',', ''));
+              money.value = TextEditingValue(
+                text: string,
+                selection: TextSelection.collapsed(offset: string.length),
+              );
+            },
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.search_rounded, color: paletteProvider[2],),
+          onPressed: () {
+            _getSearchQuery();
+          },
+        ),
+      ],
+    );
+  }
+
+  Future<List<Spec>> _getSearchQuery() async {
+    String startDate = DateFormat('yy/MM/dd').format(dateRange[0]);
+    String endDate = DateFormat('yy/MM/dd').format(dateRange[1]);
+    String type = conditionNum[0] != 0 ? "AND type = ${conditionNum[0]}" : "";
+    String category = conditionNum[1] != 0 ? "AND category = '${conditions[1][conditionNum[1]]}'" : "";
+
+    String moneyCon = money.text != "" ? "AND money = ${int.parse(money.text.replaceAll(',', ''))}" : "";
+    String order = conditionNum[2] == 0 ? "DESC" : "ASC";
+    List<Spec> newList = await SpecDBHelper().getQuery(
+        '''
+        SELECT * FROM Specs
+        WHERE dateTime BETWEEN '$startDate' AND '$endDate' $type $category $moneyCon
+        ORDER BY dateTime $order;
+        ''');
+    setState(() {
+      _resSpecs = newList;
+      print("Here ${_resSpecs.length.toString()}");
+    });
+    return newList;
   }
 
   ExpansionTile makeDetailedSearch(){
@@ -140,12 +213,7 @@ class SearchPageState  extends State<SearchPage> {
     list.add(SizedBox(height: 10,));
     list.add(makeOthers());
     list.add(SizedBox(height: 10,));
-    list.add(IconButton(
-      icon: Icon(Icons.search_rounded, color: paletteProvider[2],),
-      onPressed: () {
-
-      },
-    ));
+    list.add(makeMoneyAndSearch());
     list.add(SizedBox(height: 10,));
 
     return ExpansionTile(
@@ -155,19 +223,44 @@ class SearchPageState  extends State<SearchPage> {
     );
   }
 
+  ListView makeRes(){
+    return ListView.separated(
+      itemCount: _resSpecs.length+1,
+      itemBuilder: (context, index) {
+        if( index == 0 ) return makeDetailedSearch();
+        return Container(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: [
+              Text(_resSpecs[index-1].category!),
+              Text(_resSpecs[index-1].dateTime!),
+              Text(_resSpecs[index-1].money.toString()),
+            ],
+          ),
+        );
+      },
+      separatorBuilder: (context, index) { return const Divider(); },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     paletteProvider = context.watch<ColorProvider>().palette;
+    categoryNames = context.watch<CategoryProvider>().categories;
+    conditions[1] = ["모든 카테고리"];
+    conditions[1].addAll(categoryNames);
     return Scaffold(
         appBar: AppBar(
           title: Text("검색"),
         ),
-        body: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: makeDetailedSearch(),
-          )
-        )
+        body: GestureDetector(
+            onTap: (){
+              FocusScope.of(context).unfocus();
+            },
+            child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: makeRes()
+            ))
     );
   }
 

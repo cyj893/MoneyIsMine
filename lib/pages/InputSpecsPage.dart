@@ -25,13 +25,13 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   String pageName = "내역 추가";
   bool isUpdateLoaded = false;
 
-  List<bool> typebools = [false, false];
+  int typeBool = -1;
   final List<String> typeNames = ["지출", "수입"];
 
-  List<bool> methodbools = [false, false, false, false, false];
+  int methodBool = -1;
   final List<String> methodNames = ["기타", "카드", "이체", "현금", "기타"];
 
-  List<bool> categorybools = [];
+  int categoryBool = -1;
   List<String> categoryNames = ["기타"];
   Map<String, String> categoryMap = {"기타": "*"};
 
@@ -79,16 +79,10 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     return newlist;
   }
 
-  int _findIndex(List<bool> list){
-    for(int i = 0; i < list.length; i++){
-      if( list[i] ) return i;
-    }
-    return -1;
-  }
   void _submit(){
-    int t = _findIndex(typebools);
-    int m = _findIndex(methodbools);
-    int c = _findIndex(categorybools);
+    int t = typeBool;
+    int m = methodBool;
+    int c = categoryBool;
     if( t == -1 || money.text.isEmpty ){
       print("reject submitting");
       showDialog(
@@ -181,15 +175,11 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     return <Widget>[
       Checkbox(
         activeColor: paletteProvider[1],
-          value: typebools[index],
+          value: typeBool == index,
           onChanged: (bool? value) {
             setState(() {
-              typebools[index] = value!;
-              if( value ){
-                for(int i = 0; i < typebools.length; i++){
-                  if( i != index && typebools[i] ) typebools[i] = false;
-                }
-              }
+              if( value == true ) typeBool = index;
+              else typeBool = -1;
             });
           }),
       Text(typeNames[index]),
@@ -213,15 +203,11 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     return <Widget>[
       Checkbox(
         activeColor: paletteProvider[1],
-          value: methodbools[index],
+          value: methodBool == index,
           onChanged: (bool? value) {
             setState(() {
-              methodbools[index] = value!;
-              if( value ){
-                for(int i = 1; i < methodbools.length; i++){
-                  if( i != index && methodbools[i] ) methodbools[i] = false;
-                }
-              }
+              if( value == true ) methodBool = index;
+              else methodBool = -1;
             });
           }),
       Text(methodNames[index]),
@@ -250,23 +236,20 @@ class InputSpecsPageState extends State<InputSpecsPage> {
           splashColor: Colors.transparent,
           child: Chip(
                 avatar: CircleAvatar(
-                  child: categorybools[i] ? Text("\u{2714}") : Text(categoryMap[categoryNames[i]]!),
+                  child: categoryBool == i ? Text("\u{2714}") : Text(categoryMap[categoryNames[i]]!),
                   backgroundColor: Colors.white,
                 ),
-                backgroundColor: categorybools[i] ? paletteProvider[3] : paletteProvider[0],
-                label: categorybools[i] ? Text(categoryNames[i], style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),) : Text(categoryNames[i]),
+                backgroundColor: categoryBool == i ? paletteProvider[3] : paletteProvider[0],
+                label: categoryBool == i ? Text(categoryNames[i], style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),) : Text(categoryNames[i]),
               ),
           onTap: () {
             setState(() {
-                if( categorybools[i] ){
-                  categorybools[i] = false;
+                if( categoryBool == i ){
+                  categoryBool = -1;
                   return ;
                 }
-                categorybools[i] = true;
+                categoryBool = i;
                 print("Tapped " + categoryMap[categoryNames[i]]!);
-                for(int j = 0; j < categorybools.length; j++){
-                  if( i != j && categorybools[j] ) categorybools[j] = false;
-                }
             });
           }
       ));
@@ -682,15 +665,12 @@ class InputSpecsPageState extends State<InputSpecsPage> {
       }
       else{
         pageName = "내역 수정";
-        typebools[widget.nowInstance.type] = true;
-        methodbools[widget.nowInstance.method! == 0 ? 3 : widget.nowInstance.method!] = true;
-        if( widget.nowInstance.category == "기타" ) categorybools[categorybools.length-1] = true;
-        else{
-          for(int i = 0; i < categoryNames.length; i++){
-            if( widget.nowInstance.category! == categoryNames[i] ){
-              categorybools[i] = true;
-              break;
-            }
+        typeBool = widget.nowInstance.type;
+        methodBool = widget.nowInstance.method! == 0 ? 3 : widget.nowInstance.method!;
+        for(int i = 0; i < categoryNames.length; i++){
+          if( widget.nowInstance.category! == categoryNames[i] ){
+            categoryBool = i;
+            break;
           }
         }
         contents.text = widget.nowInstance.contents! != "." ? widget.nowInstance.contents! : "";
@@ -708,9 +688,6 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     paletteProvider = context.watch<ColorProvider>().palette;
     categoryNames = context.watch<CategoryProvider>().categories;
     categoryMap = context.watch<CategoryProvider>().map;
-    for(int i = 0; i < categoryNames.length; i++){
-      categorybools.add(false);
-    }
     if( !isUpdateLoaded ) setInstance();
     return Scaffold(
       appBar: AppBar(
