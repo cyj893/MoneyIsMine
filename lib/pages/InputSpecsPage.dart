@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:money_is_mine/pages/widgets/CustomButton.dart';
+import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 import 'package:provider/provider.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'dart:io';
@@ -371,23 +372,9 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                     )
                 ),
                 Expanded(
-                  child: TextField(
+                  child: MoneyTextField(
                     controller: money,
                     focusNode: focusNode,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: "금액을 입력하세요",
-                      isDense: true,
-                      suffixText: "\₩",
-                    ),
-                    onChanged: (string) {
-                      if( string.isEmpty ) return ;
-                      string = _formatNumber(string.replaceAll(',', ''));
-                      money.value = TextEditingValue(
-                        text: string,
-                        selection: TextSelection.collapsed(offset: string.length),
-                      );
-                    },
                   ),
                 ),
               ],

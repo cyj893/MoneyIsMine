@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:money_is_mine/db_helper/CategoryProvider.dart';
 import 'package:money_is_mine/db_helper/DBHelper.dart';
+import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 import 'package:provider/src/provider.dart';
 import 'package:money_is_mine/pages/widgets/CustomButton.dart';
 import 'package:money_is_mine/db_helper/ColorProvider.dart';
@@ -145,36 +146,22 @@ class SearchPageState  extends State<SearchPage> {
     );
   }
 
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
   final money = TextEditingController();
   bool isMoneyFocused = false;
   FocusNode focusNode = FocusNode();
 
   Row makeMoneyAndSearch(){
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        SizedBox(width: 10,),
         SizedBox(
           width: 200,
-          child: TextField(
+          child: MoneyTextField(
             controller: money,
             focusNode: focusNode,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: "금액을 입력하세요",
-              isDense: true,
-              suffixText: "\₩",
-            ),
-            onChanged: (string) {
-              if( string.isEmpty ) return ;
-              string = _formatNumber(string.replaceAll(',', ''));
-              money.value = TextEditingValue(
-                text: string,
-                selection: TextSelection.collapsed(offset: string.length),
-              );
-            },
           ),
         ),
+        Expanded(child: Container()),
         IconButton(
           icon: Icon(Icons.search_rounded, color: paletteProvider[2],),
           onPressed: () {
