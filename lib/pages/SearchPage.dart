@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:money_is_mine/db_helper/CategoryProvider.dart';
 import 'package:money_is_mine/db_helper/DBHelper.dart';
+import 'package:money_is_mine/pages/SpecPage.dart';
 import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 import 'package:provider/src/provider.dart';
 import 'package:money_is_mine/pages/widgets/CustomButton.dart';
@@ -20,6 +23,12 @@ class SearchPageState  extends State<SearchPage> {
 
   List<DateTime> dateRange = [DateTime.now().subtract(Duration(days: 7)), DateTime.now()];
   List<Spec> _resSpecs = [];
+
+  FutureOr onGoBack(dynamic value) {
+    setState(() {
+      print("onGoBack");
+    });
+  }
 
   Future<void> _selectDate(BuildContext context, int i) async {
     final DateTime? picked = await showDatePicker(
@@ -215,16 +224,41 @@ class SearchPageState  extends State<SearchPage> {
       itemCount: _resSpecs.length+1,
       itemBuilder: (context, index) {
         if( index == 0 ) return makeDetailedSearch();
-        return Container(
+        Spec spec = _resSpecs[index-1];
+        return InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SpecPage(spec)
+                  )
+              ).then(onGoBack);
+            },child: Container(
           padding: const EdgeInsets.all(8),
           child: Column(
             children: [
-              Text(_resSpecs[index-1].category!),
-              Text(_resSpecs[index-1].dateTime!),
-              Text(_resSpecs[index-1].money.toString()),
+              Row(children: [Text(spec.dateTime!,
+                style: TextStyle(color: Colors.black54),),],),
+              SizedBox(height: 8,),
+              Row(
+                children: [
+                  SizedBox(width: 80,
+                    child: Text(spec.category!,
+                      style: TextStyle(
+                          fontSize: 16
+                      ),),),
+                  Expanded(child: Text(spec.contents!),),
+                  SizedBox(width: 100,
+                    child: Text(moneyToString(spec.money) + " 원",
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                          color: spec.type == 1 ? Colors.blue : Colors.orange,
+                          fontSize: 16, fontWeight: FontWeight.bold),),),
+                ],
+              ),
             ],
           ),
-        );
+        ));
       },
       separatorBuilder: (context, index) { return const Divider(); },
     );

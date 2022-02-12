@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 
+import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 import '../db_helper/ColorProvider.dart';
 import '../db_helper/DBHelper.dart';
 
@@ -16,7 +17,6 @@ class MonthSummaryCon extends StatefulWidget {
 
 class MonthSummaryConState extends State<MonthSummaryCon> {
   List<Color> paletteProvider = [];
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
   List<int> monthSummary = [0, 0, 0];
 
   @override
@@ -67,15 +67,15 @@ class MonthSummaryConState extends State<MonthSummaryCon> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
-            child: Text("${_formatNumber(p.toString().replaceAll(',', ''))} 원",
+            child: Text("${moneyToString(p)} 원",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: Colors.blue),)),
         Expanded(child: Text(
-          "${_formatNumber((-m).toString().replaceAll(',', ''))} 원",
+          "${moneyToString(-m)} 원",
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, color: Colors.orange),)),
         Expanded(child: Text(
-          "${_formatNumber(sum.toString().replaceAll(',', ''))} 원",
+          "${moneyToString(sum)} 원",
           textAlign: TextAlign.center,
           style: TextStyle(
               fontSize: 16, color: sum >= 0 ? Colors.blue : Colors.orange),)),

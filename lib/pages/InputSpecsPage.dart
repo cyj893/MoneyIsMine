@@ -38,7 +38,6 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   final contents = TextEditingController();
 
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
   final money = TextEditingController();
 
   late var dateTime = DateTime.now();
@@ -322,10 +321,10 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
 
   void addMoney(int addVal){
-    if( money.text == "" ) money.text = '${_formatNumber(addVal.toString().replaceAll(',', ''))}';
+    if( money.text == "" ) money.text = moneyToString(addVal);
     else{
       int newVal = int.parse(money.text.replaceAll(',', '')) + addVal;
-      money.text = '${_formatNumber(newVal.toString().replaceAll(',', ''))}';
+      money.text = moneyToString(newVal);
     }
   }
 
@@ -661,7 +660,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
           }
         }
         contents.text = widget.nowInstance.contents! != "." ? widget.nowInstance.contents! : "";
-        money.text = _formatNumber((widget.nowInstance.money < 0 ? -widget.nowInstance.money : widget.nowInstance.money).toString().replaceAll(',', ''));
+        money.text = moneyToString(widget.nowInstance.money < 0 ? -widget.nowInstance.money : widget.nowInstance.money);
         dateTime = DateTime.parse('20'+widget.nowInstance.dateTime!.replaceAll('/', ''));
         memo.text = widget.nowInstance.memo! != "." ? widget.nowInstance.memo! : "";
         isUpdateLoaded = true;

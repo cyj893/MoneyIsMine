@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 import 'package:provider/src/provider.dart';
 import 'InputSpecsPage.dart';
 import '../db_helper/DBHelper.dart';
@@ -19,7 +20,6 @@ class DaySpecCon extends StatefulWidget {
 
 class DaySpecConState extends State<DaySpecCon> {
   List<Color> paletteProvider = [];
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
   List<Spec> _daySpecs = [];
 
   @override
@@ -87,13 +87,9 @@ class DaySpecConState extends State<DaySpecCon> {
         ),
         SizedBox(
             width: 100,
-            child: Text("\₩ ${_formatNumber(
-                (spec.money < 0 ? -spec.money : spec.money)
-                    .toString()
-                    .replaceAll(',', ''))}",
+            child: Text("\₩ ${moneyToString(spec.money < 0 ? -spec.money : spec.money)}",
               textAlign: TextAlign.end,
-              style: TextStyle(
-                  color: spec.type == 1 ? Colors.blue : Colors.orange),)
+              style: TextStyle(color: spec.type == 1 ? Colors.blue : Colors.orange),)
         ),
       ],
     );
@@ -167,15 +163,15 @@ class DaySpecConState extends State<DaySpecCon> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
-            child: Text("${_formatNumber(p.toString().replaceAll(',', ''))} 원",
+            child: Text("${moneyToString(p)} 원",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: Colors.blue),)),
         Expanded(child: Text(
-          "${_formatNumber((-m).toString().replaceAll(',', ''))} 원",
+          "${moneyToString(-m)} 원",
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, color: Colors.orange),)),
         Expanded(child: Text(
-          "${_formatNumber(sum.toString().replaceAll(',', ''))} 원",
+          "${moneyToString(sum)} 원",
           textAlign: TextAlign.center,
           style: TextStyle(
               fontSize: 16, color: sum >= 0 ? Colors.blue : Colors.orange),)),

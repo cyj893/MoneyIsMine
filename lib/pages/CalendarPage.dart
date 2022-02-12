@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import '../db_helper/DBHelper.dart';
@@ -13,8 +14,6 @@ class CalendarPage extends StatefulWidget {
 }
 
 class CalendarPageState extends State<CalendarPage> {
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
-
   int nowIndex = 0;
   List<String> nowType = ["지출", "수입", "합계"];
 
@@ -69,7 +68,7 @@ class CalendarPageState extends State<CalendarPage> {
     date[0] == '0' ? date = date.substring(1) : date;
 
     money = money < 0 ? -money : money;
-    String moneyString = _formatNumber(money.toString().replaceAll(',', ''));
+    String moneyString = moneyToString(money);
     if( money >= 100000 ) moneyString = moneyString.substring(0, moneyString.length-3) + "-";
     if( money >= 1000000 ) moneyString = (money ~/ 10000).toString();
     return Container(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 import 'package:provider/src/provider.dart';
 import 'package:scrolling_page_indicator/scrolling_page_indicator.dart';
 
@@ -26,8 +27,6 @@ class SpecPageState extends State<SpecPage> {
   final List<String> methodNames = ["기타", "카드", "이체", "현금", "기타"];
 
   Map<String, String> categoryMap = {"기타": "*"};
-
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
 
   List<Picture> _images = [];
   PageController _controller = PageController();
@@ -62,7 +61,7 @@ class SpecPageState extends State<SpecPage> {
   }
 
   Container makeSpecCon(){
-    String money = _formatNumber(spec.money.toString().replaceAll(',', ''));
+    String money = moneyToString(spec.money);
     String categoryIcon, categoryName;
     if( categoryMap.containsKey(spec.category!) ){
       categoryIcon = categoryMap[spec.category!]!;

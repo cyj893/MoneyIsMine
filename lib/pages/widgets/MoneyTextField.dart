@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
+
+String moneyToString(int money) => _formatNumber(money.toString());
+
 class MoneyTextField extends StatelessWidget {
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
   final controller;
   final FocusNode focusNode;
 

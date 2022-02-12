@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 
 import 'package:money_is_mine/pages/widgets/MyCard.dart';
 import 'package:money_is_mine/db_helper/DBHelper.dart';
@@ -199,8 +200,6 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
     );
   }
 
-  String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -219,11 +218,13 @@ class WeekConState extends State<WeekCon> with AutomaticKeepAliveClientMixin {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text("주간 ${nowType == 0 ? "지출" : "수입"}: ${_formatNumber(sum[nowType].toString())}원", style: TextStyle(
-                            fontSize: 20,
-                            color: nowType == 0 ? palette[0][6] : palette[1][6],
-                            fontWeight: FontWeight.bold,
-                          ),),
+                          Text("주간 ${nowType == 0 ? "지출" : "수입"}: ${moneyToString(sum[nowType])}원",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: nowType == 0 ? palette[0][6] : palette[1][6],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const SizedBox(height: 2,),
                           Text("${weekDate[0]} ~ ${weekDate[6]}",
                             style: TextStyle(
