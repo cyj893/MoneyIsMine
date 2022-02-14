@@ -184,7 +184,7 @@ class SearchPageState  extends State<SearchPage> {
   Future<List<Spec>> _getSearchQuery() async {
     String startDate = DateFormat('yy/MM/dd').format(dateRange[0]);
     String endDate = DateFormat('yy/MM/dd').format(dateRange[1]);
-    String type = conditionNum[0] != 0 ? "AND type = ${conditionNum[0]}" : "";
+    String type = conditionNum[0] != 0 ? "AND type = ${conditionNum[0]-1}" : "";
     String category = conditionNum[1] != 0 ? "AND category = '${conditions[1][conditionNum[1]]}'" : "";
 
     String moneyCon = money.text != "" ? "AND money = ${int.parse(money.text.replaceAll(',', ''))}" : "";

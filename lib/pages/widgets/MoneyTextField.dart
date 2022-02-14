@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-String _formatNumber(String s) => NumberFormat.decimalPattern('ko_KR').format(int.parse(s));
-
-String moneyToString(int money) => _formatNumber(money.toString());
+String moneyToString(int money) => NumberFormat.decimalPattern('ko_KR').format(money);
 
 class MoneyTextField extends StatelessWidget {
   final controller;
@@ -28,7 +26,7 @@ class MoneyTextField extends StatelessWidget {
       ),
       onChanged: (string) {
         if( string.isEmpty ) return ;
-        string = _formatNumber(string.replaceAll(',', ''));
+        string = moneyToString(int.parse(string.replaceAll(',', '')));
         controller.value = TextEditingValue(
           text: string,
           selection: TextSelection.collapsed(offset: string.length),
