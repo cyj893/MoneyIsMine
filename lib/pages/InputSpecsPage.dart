@@ -46,7 +46,6 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   List<DateTime> dateTime = [DateTime.now()];
   List<int> nowPage = [0];
   List<int> mw = [0];
-  List<List<String>> mwArr = [List.generate(31, (index) => (index+1).toString()), ["월", "화", "수", "목", "금", "토", "일"]];
   List<List<bool>> mwBoolArr = [List.generate(31, (index) => false), List.generate(7, (index) => false),];
   List<bool> isFixed = [false];
   List<int> repeatVal = [1];
@@ -71,7 +70,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     List<Picture> newlist = await PicDBHelper().getQuery(
       '''
       SELECT * FROM Pics
-      WHERE specID = ${i}
+      WHERE specID = $i
       '''
     );
     setState(() {
@@ -91,13 +90,13 @@ class InputSpecsPageState extends State<InputSpecsPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              content: Text("지출/수입 여부와 금액을 입력해 주세요"),
+              content: const Text("지출/수입 여부와 금액을 입력해 주세요"),
               actions: [
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("ok"))
+                    child: const Text("ok"))
               ],
             );
           });
@@ -108,11 +107,11 @@ class InputSpecsPageState extends State<InputSpecsPage> {
   }
 
   Future<void> _insertFixed(int t, int m, int c) async {
-    if( mw == 0 ){
+    if( mw[0] == 0 ){
       for(int i = 0; i < 31; i++){
         DateTime date = DateTime.now();
         if( mwBoolArr[mw[0]][i] == false ) continue;
-        date = DateTime(date.year, date.month, int.parse(mwArr[mw[0]][i]));
+        date = DateTime(date.year, date.month, i+1);
         for(int j = 0; j < repeatVal[0]; j++){
           await _insertDB(t, m, c, date);
           date = DateTime(date.year, date.month + 1, date.day);
@@ -225,7 +224,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                     paletteProvider[0], paletteProvider[1], paletteProvider[3]), const Divider(),
                 ContentsCon(contents), const Divider(),
                 MoneyCon(money, paletteProvider[3]), const Divider(),
-                DateTimeCon(dateTime, nowPage, mw, mwArr, mwBoolArr,
+                DateTimeCon(dateTime, nowPage, mw, mwBoolArr,
                     isFixed, repeatVal, paletteProvider[0], paletteProvider[1], paletteProvider[3]), const Divider(),
                 MemoCon(memo), const Divider(),
                 PicCon(picbools, _images, _existingImages, paletteProvider[1]), const Divider(),
@@ -235,9 +234,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          _submit();
-        },
+        onPressed: (){ _submit(); },
         child: const Icon(Icons.check_rounded),
       ),
     );

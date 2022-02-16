@@ -2,22 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class DateTimeCon extends StatefulWidget {
-  List<DateTime> dateTime;
-  List<int> nowPage;
-  List<int> mw;
-  List<List<String>> mwArr;
-  List<List<bool>> mwBoolArr;
-  List<bool> isFixed;
-  List<int> repeatVal;
-  Color chipColor;
-  Color iconColor;
-  Color selectedColor;
+  final List<DateTime> dateTime;
+  final List<int> nowPage;
+  final List<int> mw;
+  final List<List<bool>> mwBoolArr;
+  final List<bool> isFixed;
+  final List<int> repeatVal;
+  final Color chipColor;
+  final Color iconColor;
+  final Color selectedColor;
 
   DateTimeCon(
       this.dateTime,
       this.nowPage,
       this.mw,
-      this.mwArr,
       this.mwBoolArr,
       this.isFixed,
       this.repeatVal,
@@ -33,6 +31,8 @@ class DateTimeCon extends StatefulWidget {
 class DateTimeConState extends State<DateTimeCon> {
 
   PageController _controller = PageController();
+  List<List<String>> mwArr = [List.generate(31, (index) => (index+1).toString()),
+                              ["월", "화", "수", "목", "금", "토", "일"]];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -51,7 +51,7 @@ class DateTimeConState extends State<DateTimeCon> {
     showDialog(context: context, builder: (context){
       return AlertDialog(
         content: Wrap(
-          children: List.generate(widget.mwArr[widget.mw[0]].length, (index) =>
+          children: List.generate(mwArr[widget.mw[0]].length, (index) =>
               InkWell(
                   onTap: () {
                     widget.mwBoolArr[widget.mw[0]][index] = !widget.mwBoolArr[widget.mw[0]][index];
@@ -59,7 +59,7 @@ class DateTimeConState extends State<DateTimeCon> {
                     Navigator.pop(context);
                   },
                   child: Chip(
-                    label: Text(widget.mwArr[widget.mw[0]][index],
+                    label: Text(mwArr[widget.mw[0]][index],
                       style: TextStyle(
                           color: widget.mwBoolArr[widget.mw[0]][index] ? Colors
                               .white : Colors.black,
@@ -74,70 +74,6 @@ class DateTimeConState extends State<DateTimeCon> {
     });
   }
 
-  Widget makeDialogContents(){
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            InkWell(
-              onTap: () {
-                setState(() { widget.mw[0] = 1 - widget.mw[0]; });
-              },
-              child: Chip(
-                label: Text(widget.mw[0] == 0 ? "매월" : "매주",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                backgroundColor: widget.iconColor,
-              ),
-            ),
-            SizedBox(width: 10,),
-            Expanded(
-              child: Container(
-                height: 100,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        children: List.generate(
-                            widget.mwBoolArr[widget.mw[0]].length,
-                                (index) => widget.mwBoolArr[widget.mw[0]][index]
-                                ? Text("${widget.mwArr[widget.mw[0]][index]}, ")
-                                : SizedBox.shrink()),
-                      ),
-                    ),
-                    IconButton(
-                        onPressed: () { showSelectDialog(); },
-                        icon: Icon(Icons.add_circle_outline_rounded, color: widget.iconColor,)),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(width: 10,),
-            Text(widget.mw == 0 ? "일" : "요일"),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            NumberPicker(
-                selectedTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: widget.selectedColor),
-                minValue: 1,
-                maxValue: 100,
-                value: widget.repeatVal[0],
-                textStyle: TextStyle(color: Colors.grey),
-                onChanged: (val){
-                  setState(() { widget.repeatVal[0] = val; });
-                }),
-            Text("회  반복"),
-          ],
-        )
-      ],
-    );
-  }
-
   void showFixedDialog(){
     showDialog(
         context: context,
@@ -145,22 +81,82 @@ class DateTimeConState extends State<DateTimeCon> {
           return StatefulBuilder(
               builder: (context, setState) {
                 return AlertDialog(
-                    title: Text("고정 지출/수입일"),
+                    title: const Text("고정 지출/수입일"),
                     actions: [
                       TextButton(
                           onPressed: () {
                             widget.isFixed[0] = false;
                             Navigator.of(context).pop();
                           },
-                          child: Text("취소")),
+                          child: const Text("취소")),
                       TextButton(
                           onPressed: () {
                             widget.isFixed[0] = true;
                             Navigator.of(context).pop();
                           },
-                          child: Text("저장")),
+                          child: const Text("저장")),
                     ],
-                    content: makeDialogContents(),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                setState(() { widget.mw[0] = 1 - widget.mw[0]; });
+                              },
+                              child: Chip(
+                                label: Text(widget.mw[0] == 0 ? "매월" : "매주",
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                                backgroundColor: widget.iconColor,
+                              ),
+                            ),
+                            const SizedBox(width: 10,),
+                            Expanded(
+                              child: Container(
+                                height: 100,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 100,
+                                      child: Wrap(
+                                        alignment: WrapAlignment.center,
+                                        children: List.generate(
+                                            widget.mwBoolArr[widget.mw[0]].length,
+                                                (index) => widget.mwBoolArr[widget.mw[0]][index]
+                                                ? Text("${mwArr[widget.mw[0]][index]}, ")
+                                                : SizedBox.shrink()),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () { showSelectDialog(); },
+                                        icon: Icon(Icons.add_circle_outline_rounded, color: widget.iconColor,)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10,),
+                            Text(widget.mw[0] == 0 ? "일" : "요일"),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            NumberPicker(
+                                selectedTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: widget.selectedColor),
+                                minValue: 1,
+                                maxValue: 100,
+                                value: widget.repeatVal[0],
+                                textStyle: const TextStyle(color: Colors.grey),
+                                onChanged: (val){
+                                  setState(() { widget.repeatVal[0] = val; });
+                                }),
+                            const Text("회  반복"),
+                          ],
+                        )
+                      ],
+                    ),
                 );
               });
         }).then((value) => setState(() {}));
@@ -169,8 +165,8 @@ class DateTimeConState extends State<DateTimeCon> {
   PageView makePageView(){
     String mwStr = widget.mw[0] == 0 ? "매월" : "매주";
     String things = "";
-    for(int i = 0; i < widget.mwArr[widget.mw[0]].length; i++){
-      if( widget.mwBoolArr[widget.mw[0]][i] ) things += widget.mwArr[widget.mw[0]][i] + ", ";
+    for(int i = 0; i < mwArr[widget.mw[0]].length; i++){
+      if( widget.mwBoolArr[widget.mw[0]][i] ) things += mwArr[widget.mw[0]][i] + ", ";
     }
     things = things == "" ? "?" : things.substring(0, things.length-2);
     String mwStr2 = widget.mw[0] == 0 ? "일" : "요일";
@@ -186,7 +182,7 @@ class DateTimeConState extends State<DateTimeCon> {
         Center(
           child: InkWell(
             child: Text("${widget.dateTime[0].toLocal()}".split(' ')[0],
-              style: TextStyle(decoration: TextDecoration.underline,
+              style: const TextStyle(decoration: TextDecoration.underline,
                   decorationStyle: TextDecorationStyle.dashed,
                   fontSize: 16),
               textAlign: TextAlign.center,),
@@ -245,7 +241,6 @@ class DateTimeConState extends State<DateTimeCon> {
 
   @override
   Widget build(BuildContext context) {
-    print("Rebuild");
     _controller = PageController(initialPage: widget.nowPage[0]);
     return makeDateTimeCon();
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ContentsCon extends StatefulWidget {
-  TextEditingController contents;
+  final TextEditingController contents;
 
   ContentsCon(
       this.contents,

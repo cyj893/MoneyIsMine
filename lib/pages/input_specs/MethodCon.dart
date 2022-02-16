@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MethodCon extends StatefulWidget {
-  List<int> methodBool;
-  Color color;
+  final List<int> methodBool;
+  final Color color;
 
   MethodCon(
       this.methodBool,

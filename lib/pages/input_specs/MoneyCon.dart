@@ -4,8 +4,8 @@ import 'package:money_is_mine/pages/widgets/CustomButton.dart';
 import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
 
 class MoneyCon extends StatefulWidget {
-  TextEditingController money;
-  Color textColor;
+  final TextEditingController money;
+  final Color textColor;
 
   MoneyCon(
       this.money,

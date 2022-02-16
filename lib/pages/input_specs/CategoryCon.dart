@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'CategoryEditPage.dart';
 
 class CategoryCon extends StatefulWidget {
-  List<int> categoryBool;
-  List<String> categoryNames;
-  Map<String, String> categoryMap;
-  Color chipColor;
-  Color iconColor;
-  Color selectedColor;
+  final List<int> categoryBool;
+  final List<String> categoryNames;
+  final Map<String, String> categoryMap;
+  final Color chipColor;
+  final Color iconColor;
+  final Color selectedColor;
 
   CategoryCon(
       this.categoryBool,
@@ -33,7 +33,7 @@ class CategoryConState extends State<CategoryCon> {
               splashColor: Colors.transparent,
               child: Chip(
                 avatar: CircleAvatar(
-                  child: widget.categoryBool[0] == i ? Text("\u{2714}") : Text(widget.categoryMap[widget.categoryNames[i]]!),
+                  child: widget.categoryBool[0] == i ? const Text("\u{2714}") : Text(widget.categoryMap[widget.categoryNames[i]]!),
                   backgroundColor: Colors.white,
                 ),
                 backgroundColor: widget.categoryBool[0] == i ? widget.selectedColor : widget.chipColor,
@@ -50,7 +50,7 @@ class CategoryConState extends State<CategoryCon> {
                 });
               }
           ));
-      list.add(SizedBox(width: 10));
+      list.add(const SizedBox(width: 10));
     }
     return list;
   }
@@ -65,7 +65,7 @@ class CategoryConState extends State<CategoryCon> {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text("카테고리"),
+                    const Text("카테고리"),
                     IconButton(
                       iconSize: 20,
                       onPressed: () {
@@ -76,7 +76,7 @@ class CategoryConState extends State<CategoryCon> {
                             )
                         );
                       },
-                      icon: Icon(Icons.format_list_bulleted_rounded),
+                      icon: const Icon(Icons.format_list_bulleted_rounded),
                       color: widget.iconColor,
                     ),
                   ]

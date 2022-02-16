@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MemoCon extends StatefulWidget {
-  TextEditingController memo;
+  final TextEditingController memo;
 
   MemoCon(
       this.memo,

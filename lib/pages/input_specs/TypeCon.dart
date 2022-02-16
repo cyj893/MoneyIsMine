@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class TypeCon extends StatefulWidget {
-  List<int> typeBool;
-  Color color;
+  final List<int> typeBool;
+  final Color color;
 
   TypeCon(
       this.typeBool,
@@ -37,7 +37,7 @@ class TypeConState extends State<TypeCon> {
         height: 50,
         child: Row(
           children: <Widget>[
-            Text("*", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
+            const Text("*", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
             Expanded(child:Row(children: initTypes(0))),
             Expanded(child:Row(children: initTypes(1))),
           ],

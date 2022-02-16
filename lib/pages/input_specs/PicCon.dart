@@ -5,10 +5,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:money_is_mine/db_helper/DBHelper.dart';
 
 class PicCon extends StatefulWidget {
-  List<int> picbools = [];
-  List<XFile> images = [];
-  List<Picture> existingImages = [];
-  Color iconColor;
+  final List<int> picbools;
+  final List<XFile> images;
+  final List<Picture> existingImages;
+  final Color iconColor;
 
   PicCon(
     this.picbools,
