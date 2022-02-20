@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
+import 'package:money_is_mine/pages/widgets/money_textfield.dart';
 import 'package:provider/src/provider.dart';
 import 'package:scrolling_page_indicator/scrolling_page_indicator.dart';
 
-import '../db_helper/DBHelper.dart';
-import 'InputSpecsPage.dart';
+import '../db_helper/db_helper.dart';
+import 'input_specs_page.dart';
 
 class SpecPage extends StatefulWidget {
   final Spec nowInstance;

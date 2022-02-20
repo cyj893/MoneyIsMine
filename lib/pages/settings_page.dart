@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:money_is_mine/db_helper/InputsProvider.dart';
-import '../db_helper/ColorProvider.dart';
+import 'package:money_is_mine/db_helper/inputs_provider.dart';
+import '../db_helper/color_provider.dart';
 import 'package:provider/src/provider.dart';
 
 class SettingsPage extends StatefulWidget {

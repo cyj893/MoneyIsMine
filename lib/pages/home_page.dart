@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'DaySpecCon.dart';
-import 'BottomNaviBar.dart';
-import 'MonthSummaryCon.dart';
-import 'SettingsPage.dart';
+import 'day_spec_con.dart';
+import 'bottom_navi_bar.dart';
+import 'month_summary_con.dart';
+import 'settings_page.dart';
 
 class MyHomePage extends StatefulWidget {
 

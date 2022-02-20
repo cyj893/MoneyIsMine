@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
+import 'package:money_is_mine/pages/widgets/money_textfield.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import '../db_helper/DBHelper.dart';
-import 'DaySpecCon.dart';
+import '../db_helper/db_helper.dart';
+import 'day_spec_con.dart';
 
 class CalendarPage extends StatefulWidget {
 

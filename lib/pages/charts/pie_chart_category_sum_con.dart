@@ -3,8 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 
-import 'package:money_is_mine/pages/widgets/MyCard.dart';
-import 'package:money_is_mine/db_helper/DBHelper.dart';
+import 'package:money_is_mine/pages/widgets/my_card.dart';
+import 'package:money_is_mine/db_helper/db_helper.dart';
 
 class CategorySumCon extends StatefulWidget {
 

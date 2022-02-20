@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import 'InputsDBHelper.dart';
+import 'inputs_db_helper.dart';
 
 class InputsProvider with ChangeNotifier {
   static final InputsProvider _inputsProvider = InputsProvider._internal();

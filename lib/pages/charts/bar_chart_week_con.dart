@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
+import 'package:money_is_mine/pages/widgets/money_textfield.dart';
 
-import 'package:money_is_mine/pages/widgets/MyCard.dart';
-import 'package:money_is_mine/db_helper/DBHelper.dart';
+import 'package:money_is_mine/pages/widgets/my_card.dart';
+import 'package:money_is_mine/db_helper/db_helper.dart';
 
 class WeekCon extends StatefulWidget {
   final DateTime _dateTime;

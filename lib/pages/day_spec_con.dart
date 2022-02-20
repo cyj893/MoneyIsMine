@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
+import 'package:money_is_mine/pages/widgets/money_textfield.dart';
 import 'package:provider/src/provider.dart';
-import 'InputSpecsPage.dart';
-import '../db_helper/DBHelper.dart';
-import '../db_helper/ColorProvider.dart';
-import 'SpecPage.dart';
+import 'input_specs_page.dart';
+import '../db_helper/db_helper.dart';
+import '../db_helper/color_provider.dart';
+import 'spec_page.dart';
 
 class DaySpecCon extends StatefulWidget {
 

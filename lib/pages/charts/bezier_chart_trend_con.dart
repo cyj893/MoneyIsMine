@@ -3,9 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:bezier_chart/bezier_chart.dart';
 import 'package:provider/src/provider.dart';
 
-import 'package:money_is_mine/pages/widgets/MyCard.dart';
-import 'package:money_is_mine/db_helper/DBHelper.dart';
-import 'package:money_is_mine/db_helper/ColorProvider.dart';
+import 'package:money_is_mine/pages/widgets/my_card.dart';
+import 'package:money_is_mine/db_helper/db_helper.dart';
+import 'package:money_is_mine/db_helper/color_provider.dart';
 
 class TrendCon extends StatefulWidget {
 

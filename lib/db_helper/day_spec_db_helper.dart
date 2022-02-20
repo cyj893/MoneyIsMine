@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'Pair.dart';
-import 'models/SpecModel.dart';
+import 'pair.dart';
+import 'models/spec_model.dart';
 
 class DaySpecDBHelper {
   static final DaySpecDBHelper _daySpecProvider = DaySpecDBHelper._internal();

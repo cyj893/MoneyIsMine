@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:money_is_mine/db_helper/CategoryProvider.dart';
-import 'package:money_is_mine/db_helper/DBHelper.dart';
-import 'package:money_is_mine/pages/SpecPage.dart';
-import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
+import 'package:money_is_mine/db_helper/category_provider.dart';
+import 'package:money_is_mine/db_helper/db_helper.dart';
+import 'package:money_is_mine/pages/spec_page.dart';
+import 'package:money_is_mine/pages/widgets/money_textfield.dart';
 import 'package:provider/src/provider.dart';
-import 'package:money_is_mine/pages/widgets/CustomButton.dart';
-import 'package:money_is_mine/db_helper/ColorProvider.dart';
+import 'package:money_is_mine/pages/widgets/custom_button.dart';
+import 'package:money_is_mine/db_helper/color_provider.dart';
 
 class SearchPage extends StatefulWidget {
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'db_helper/InputsProvider.dart';
+import 'db_helper/inputs_provider.dart';
 import 'package:provider/provider.dart';
-import 'db_helper/DBHelper.dart';
-import 'pages/HomePage.dart';
-import 'db_helper/ColorProvider.dart';
+import 'db_helper/db_helper.dart';
+import 'pages/home_page.dart';
+import 'db_helper/color_provider.dart';
 
 void main() {
   SpecDBHelper();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'CategoryEditPage.dart';
+import 'category_edit_page.dart';
 
 class CategoryCon extends StatefulWidget {
   final List<int> categoryBool;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'charts/PieChartCategorySumCon.dart';
-import 'charts/BarChartWeekCon.dart';
-import 'charts/BezierChartTrendCon.dart';
+import 'charts/pie_chart_category_sum_con.dart';
+import 'charts/bar_chart_week_con.dart';
+import 'charts/bezier_chart_trend_con.dart';
 
 class ChartPage extends StatefulWidget {
 

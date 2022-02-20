@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 
-import '../db_helper/DBHelper.dart';
-import '../db_helper/ColorProvider.dart';
-import 'CalendarPage.dart';
-import 'ChartPage.dart';
-import 'InputSpecsPage.dart';
-import 'HomePage.dart';
-import 'SearchPage.dart';
+import '../db_helper/db_helper.dart';
+import '../db_helper/color_provider.dart';
+import 'calendar_page.dart';
+import 'chart_page.dart';
+import 'input_specs_page.dart';
+import 'home_page.dart';
+import 'search_page.dart';
 
 
 void goHome(BuildContext context, onGoBack){

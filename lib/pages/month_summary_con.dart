@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 
-import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
-import '../db_helper/ColorProvider.dart';
-import '../db_helper/DBHelper.dart';
+import 'package:money_is_mine/pages/widgets/money_textfield.dart';
+import '../db_helper/color_provider.dart';
+import '../db_helper/db_helper.dart';
 
 class MonthSummaryCon extends StatefulWidget {
 

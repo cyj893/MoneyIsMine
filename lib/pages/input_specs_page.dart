@@ -2,20 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:money_is_mine/db_helper/InputsProvider.dart';
+import 'package:money_is_mine/db_helper/inputs_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../db_helper/DBHelper.dart';
-import 'package:money_is_mine/pages/widgets/MoneyTextField.dart';
-import '../db_helper/ColorProvider.dart';
-import 'input_specs/DateTimeCon.dart';
-import 'input_specs/TypeCon.dart';
-import 'input_specs/MethodCon.dart';
-import 'input_specs/CategoryCon.dart';
-import 'input_specs/ContentsCon.dart';
-import 'input_specs/MoneyCon.dart';
-import 'input_specs/MemoCon.dart';
-import 'input_specs/PicCon.dart';
+import '../db_helper/db_helper.dart';
+import 'package:money_is_mine/pages/widgets/money_textfield.dart';
+import '../db_helper/color_provider.dart';
+import 'input_specs/datetime_con.dart';
+import 'input_specs/type_con.dart';
+import 'input_specs/method_con.dart';
+import 'input_specs/category_con.dart';
+import 'input_specs/contents_con.dart';
+import 'input_specs/money_con.dart';
+import 'input_specs/memo_con.dart';
+import 'input_specs/pic_con.dart';
 
 class InputSpecsPage extends StatefulWidget {
   final Spec nowInstance;

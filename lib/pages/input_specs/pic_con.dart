@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:money_is_mine/db_helper/DBHelper.dart';
+import 'package:money_is_mine/db_helper/db_helper.dart';
 
 class PicCon extends StatefulWidget {
   final List<int> picbools;
