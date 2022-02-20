@@ -106,7 +106,6 @@ class ChartPageState extends State<ChartPage> {
               const SizedBox(height: 15,),
               TrendCon(),
               const SizedBox(height: 15,),
-              const SizedBox(height: 200,),
             ],
           ),
         ),

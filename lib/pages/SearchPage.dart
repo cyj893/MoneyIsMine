@@ -24,6 +24,17 @@ class SearchPageState  extends State<SearchPage> {
   List<DateTime> dateRange = [DateTime.now().subtract(Duration(days: 7)), DateTime.now()];
   List<Spec> _resSpecs = [];
 
+  List<String> categoryNames = ["기타"];
+
+  List<List<String>> conditions = [
+    ["지출/수입", "지출", "수입"],
+    ["모든 카테고리"],
+    ["최신순", "과거순"]
+  ];
+  List<int> conditionNum = [0, 0, 0];
+
+  bool isEmptyRes = false;
+
   FutureOr onGoBack(dynamic value) {
     setState(() {
       print("onGoBack");
@@ -79,14 +90,6 @@ class SearchPageState  extends State<SearchPage> {
     );
   }
 
-  List<String> categoryNames = ["기타"];
-
-  List<List<String>> conditions = [
-    ["지출/수입", "지출", "수입"],
-    ["모든 카테고리"],
-    ["최신순", "과거순"]
-  ];
-  List<int> conditionNum = [0, 0, 0];
   InkWell makeCondition(int ind){
     return InkWell(
       onTap: () {
@@ -197,6 +200,7 @@ class SearchPageState  extends State<SearchPage> {
         ''');
     setState(() {
       _resSpecs = newList;
+      isEmptyRes = _resSpecs.isEmpty;
       print("Here ${_resSpecs.length.toString()}");
     });
     return newList;
@@ -206,24 +210,32 @@ class SearchPageState  extends State<SearchPage> {
     List<Widget> list = [];
 
     list.add(makeDatePicker());
-    list.add(SizedBox(height: 10,));
+    list.add(const SizedBox(height: 10,));
     list.add(makeOthers());
-    list.add(SizedBox(height: 10,));
+    list.add(const SizedBox(height: 10,));
     list.add(makeMoneyAndSearch());
-    list.add(SizedBox(height: 10,));
+    list.add(const SizedBox(height: 10,));
 
     return ExpansionTile(
       initiallyExpanded: true,
-      title: Text("상세 검색"),
+      title: const Text("상세 검색"),
       children: list,
     );
   }
 
   ListView makeRes(){
     return ListView.separated(
-      itemCount: _resSpecs.length+1,
+      itemCount: _resSpecs.length+2,
       itemBuilder: (context, index) {
         if( index == 0 ) return makeDetailedSearch();
+        if( index == _resSpecs.length+1 ){
+          if( _resSpecs.isEmpty ){
+            return isEmptyRes ? const Center(child: Text("결과가 없어요"),) : const Center(child: Text("검색해 보세요"));
+          }
+          else{
+            return const SizedBox.shrink();
+          }
+        }
         Spec spec = _resSpecs[index-1];
         return InkWell(
             onTap: () {

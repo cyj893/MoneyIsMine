@@ -21,6 +21,7 @@ class TrendConState extends State<TrendCon> {
     [Color.fromRGBO(225, 39, 0, 0.7), Color.fromRGBO(255, 78, 2, 0.7), Color.fromRGBO(254, 120, 39, 0.7), Color.fromRGBO(255, 162, 69, 0.7), Color.fromRGBO(254, 199, 105, 0.7), Color.fromRGBO(254, 220, 139, 0.7), Color(0xff9F2B2B)],
     [Color.fromRGBO(0, 39, 225, 0.7), Color.fromRGBO(2, 78, 255, 0.7), Color.fromRGBO(39, 120, 254, 0.7), Color.fromRGBO(69, 162, 255, 0.7), Color.fromRGBO(105, 199, 254, 0.7), Color.fromRGBO(139, 220, 254, 0.7), Color(0xff2B2B9F)],
   ];
+  int maxVal = 0;
 
   @override
   void initState() {
@@ -36,7 +37,6 @@ class TrendConState extends State<TrendCon> {
     return newMap;
   }
 
-  int maxVal = 0;
   BezierLine makeLine(int type, DateTime fromDate){
     List<DataPoint<DateTime>> list = [];
     DateTime t = fromDate;
@@ -116,7 +116,7 @@ class TrendConState extends State<TrendCon> {
             xAxisTextStyle: TextStyle(color: Colors.black12),
             displayYAxis: true,
             yAxisTextStyle: TextStyle(color: Colors.black12),
-            stepsYAxis: 20000,
+            stepsYAxis: 50000,
             pinchZoom: true,
             verticalIndicatorStrokeWidth: 2.0,
             verticalIndicatorColor: Colors.black12,
@@ -147,7 +147,7 @@ class TrendConState extends State<TrendCon> {
                       fontWeight: FontWeight.bold,
                     ),),
                     const SizedBox(height: 2,),
-                    Text("sadsdasda",
+                    Text("~ ${DateFormat('yy/MM/dd').format(DateTime.now())}",
                       style: TextStyle(
                           color: paletteProvider[3],
                           fontSize: 16,

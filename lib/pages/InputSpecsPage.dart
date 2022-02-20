@@ -102,14 +102,14 @@ class InputSpecsPageState extends State<InputSpecsPage> {
           });
       return ;
     }
-    if( isFixed[0] ) _insertFixed(t, m, c);
+    if( isFixed[0] ) _insertFixed(t, m, c, dateTime[0]);
     else _insertDB(t, m, c, dateTime[0]);
   }
 
-  Future<void> _insertFixed(int t, int m, int c) async {
+  Future<void> _insertFixed(int t, int m, int c, DateTime dt) async {
     if( mw[0] == 0 ){
       for(int i = 0; i < 31; i++){
-        DateTime date = DateTime.now();
+        DateTime date = dt;
         if( mwBoolArr[mw[0]][i] == false ) continue;
         date = DateTime(date.year, date.month, i+1);
         for(int j = 0; j < repeatVal[0]; j++){

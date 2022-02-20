@@ -47,33 +47,6 @@ class DateTimeConState extends State<DateTimeCon> {
     }
   }
 
-  void showSelectDialog(){
-    showDialog(context: context, builder: (context){
-      return AlertDialog(
-        content: Wrap(
-          children: List.generate(mwArr[widget.mw[0]].length, (index) =>
-              InkWell(
-                  onTap: () {
-                    widget.mwBoolArr[widget.mw[0]][index] = !widget.mwBoolArr[widget.mw[0]][index];
-                    setState(() {});
-                    Navigator.pop(context);
-                  },
-                  child: Chip(
-                    label: Text(mwArr[widget.mw[0]][index],
-                      style: TextStyle(
-                          color: widget.mwBoolArr[widget.mw[0]][index] ? Colors
-                              .white : Colors.black,
-                          fontWeight: widget.mwBoolArr[widget.mw[0]][index]
-                              ? FontWeight.bold : FontWeight.normal),),
-                    backgroundColor: widget.mwBoolArr[widget.mw[0]][index]
-                        ? widget.selectedColor
-                        : widget.chipColor,
-                  ))),
-        ),
-      );
-    });
-  }
-
   void showFixedDialog(){
     showDialog(
         context: context,
@@ -130,7 +103,32 @@ class DateTimeConState extends State<DateTimeCon> {
                                       ),
                                     ),
                                     IconButton(
-                                        onPressed: () { showSelectDialog(); },
+                                        onPressed: () {
+                                          showDialog(context: context, builder: (context){
+                                            return AlertDialog(
+                                              content: Wrap(
+                                                children: List.generate(mwArr[widget.mw[0]].length, (index) =>
+                                                    InkWell(
+                                                        onTap: () {
+                                                          widget.mwBoolArr[widget.mw[0]][index] = !widget.mwBoolArr[widget.mw[0]][index];
+                                                          setState(() {});
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Chip(
+                                                          label: Text(mwArr[widget.mw[0]][index],
+                                                            style: TextStyle(
+                                                                color: widget.mwBoolArr[widget.mw[0]][index] ? Colors
+                                                                    .white : Colors.black,
+                                                                fontWeight: widget.mwBoolArr[widget.mw[0]][index]
+                                                                    ? FontWeight.bold : FontWeight.normal),),
+                                                          backgroundColor: widget.mwBoolArr[widget.mw[0]][index]
+                                                              ? widget.selectedColor
+                                                              : widget.chipColor,
+                                                        ))),
+                                              ),
+                                            );
+                                          });
+                                        },
                                         icon: Icon(Icons.add_circle_outline_rounded, color: widget.iconColor,)),
                                   ],
                                 ),

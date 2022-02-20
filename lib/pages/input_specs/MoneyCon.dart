@@ -21,6 +21,17 @@ class MoneyConState extends State<MoneyCon> {
   bool isMoneyFocused = false;
   FocusNode focusNode = FocusNode();
 
+  @override
+  void initState(){
+    super.initState();
+
+    focusNode.addListener(() {
+      setState(() {
+        isMoneyFocused = focusNode.hasFocus;
+      });
+    });
+  }
+
   void addMoney(int addVal){
     if( widget.money.text == "" ) widget.money.text = moneyToString(addVal);
     else{
@@ -50,10 +61,9 @@ class MoneyConState extends State<MoneyCon> {
   }
 
   AnimatedContainer makeMoneyCon(){
-    focusNode.addListener(() { isMoneyFocused = focusNode.hasFocus; });
     return AnimatedContainer(
       padding: const EdgeInsets.only(left: 8, right: 8),
-      height: isMoneyFocused ? 100 : 50,
+      height: isMoneyFocused ? 110 : 50,
       duration: Duration(milliseconds: 300),
       child: SingleChildScrollView(
         child: Column(
@@ -86,11 +96,7 @@ class MoneyConState extends State<MoneyCon> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: (){
-          FocusScope.of(context).unfocus();
-        },
-        child: makeMoneyCon());
+    return makeMoneyCon();
   }
 
 }
