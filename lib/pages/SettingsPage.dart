@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_is_mine/db_helper/InputsProvider.dart';
 import '../db_helper/ColorProvider.dart';
 import 'package:provider/src/provider.dart';
 
@@ -15,7 +16,7 @@ class SettingsPageState  extends State<SettingsPage> {
   List<bool> colorBoolArr = List.generate(allPalette.length, (index) => false);
   int nowColorIndex = 0;
 
-  Row makePalette(int ind){
+  ListTile makePalette(int ind){
     List<Widget> list = [];
     list.add(Checkbox(
         activeColor: allPalette[ind][1],
@@ -38,10 +39,10 @@ class SettingsPageState  extends State<SettingsPage> {
         decoration: BoxDecoration(
           border: Border.all(color: allPalette[ind][i]),
           color: allPalette[ind][i],
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(5.0)),
         ),
       ));
-      list.add(SizedBox(width: 5,));
+      list.add(const SizedBox(width: 5,));
     }
     if( ind == 0 ){
       list.add(Expanded(child: Container(),));
@@ -56,15 +57,71 @@ class SettingsPageState  extends State<SettingsPage> {
           },
           icon: Icon(Icons.save_rounded, color: paletteProvider[2],)),);
     }
-    return Row(
-      children: list,
-    );
+    return ListTile(title: Row(children: list),);
   }
 
   ExpansionTile makeColorSelect(){
     return ExpansionTile(
-      title: Text("색상"),
+      title: const Text("색상"),
         children: List.generate(allPalette.length, (index) => makePalette(index)),
+    );
+  }
+
+  @override
+  void initState(){
+    super.initState();
+
+    inputStrings = context.read<InputsProvider>().inputStrings;
+    inputBoolArr = context.read<InputsProvider>().inputBoolArr;
+    tempInputBoolArr.addAll(inputBoolArr);
+    print("inputStrings: $inputStrings");
+  }
+
+  List<String> inputStrings = [];
+  List<bool> inputBoolArr = [];
+  List<bool> tempInputBoolArr = [];
+
+  ListTile makeCheckBoxes(int ind){
+    List<Widget> list = [];
+    list.add(Checkbox(
+        activeColor: paletteProvider[1],
+        value: tempInputBoolArr[ind],
+        onChanged: (bool? value) {
+          if( inputStrings[ind] == "지출/수입" || inputStrings[ind] == "금액" ) return ;
+          setState(() {
+            tempInputBoolArr[ind] = value!;
+          });
+        }));
+    List<Widget> rowList = [];
+    rowList.add(Text(inputStrings[ind]));
+    if( inputStrings[ind] == "지출/수입" || inputStrings[ind] == "금액" ){
+      rowList.add(const Text(" *(필수)", style: TextStyle(color: Colors.orange),));
+    }
+    else if( inputStrings[ind] == "카테고리" || inputStrings[ind] == "날짜" ){
+      rowList.add(Text(" (권장)", style: TextStyle(color: paletteProvider[3]),));
+    }
+    list.add(Row(children: rowList,));
+    list.add(const SizedBox(width: 5,));
+
+    if( ind == 0 ){
+      list.add(Expanded(child: Container(),));
+      list.add(IconButton(
+          onPressed: () {
+            context.read<InputsProvider>().edit(tempInputBoolArr);
+            context.read<InputsProvider>().save();
+          },
+          icon: Icon(Icons.save_rounded, color: paletteProvider[2],)),);
+    }
+    return ListTile(
+      key: Key('$ind'),
+      title: Row(children: list,),
+    );
+  }
+
+  ExpansionTile makeInputSelect(){
+    return ExpansionTile(
+      title: const Text("내역 추가 페이지"),
+      children: List.generate(inputStrings.length, (index) => makeCheckBoxes(index)),
     );
   }
 
@@ -73,14 +130,16 @@ class SettingsPageState  extends State<SettingsPage> {
     paletteProvider = context.watch<ColorProvider>().palette;
     return Scaffold(
         appBar: AppBar(
-          title: Text("설정"),
+          title: const Text("설정"),
         ),
         body: Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: ListView(
               children: [
                 makeColorSelect(),
-                Divider(),
+                const Divider(),
+                makeInputSelect(),
+                const Divider(),
               ],
             ),
         )

@@ -95,33 +95,45 @@ class TrendConState extends State<TrendCon> {
 
   Widget sample2(BuildContext context, data) {
     DateSpecsMap = data;
+    if( DateSpecsMap[0].isEmpty ){
+      return SizedBox(
+        height: MediaQuery.of(context).size.width/2,
+        width: MediaQuery.of(context).size.width,
+        child: Center(
+          child: Text("데이터가 없습니다",
+            style: TextStyle(
+              color: paletteProvider[4],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    }
     DateTime toDate = DateTime.now();
     DateTime fromDate = DateTime(toDate.year-1, toDate.month, toDate.day);
-    return Center(
-      child: Container(
-        height: MediaQuery.of(context).size.width,
-        width: MediaQuery.of(context).size.width,
-        child: BezierChart(
-          bezierChartScale: BezierChartScale.WEEKLY,
-          fromDate: fromDate,
-          toDate: toDate,
-          selectedDate: toDate,
-          series: [
-            makeSumLine(fromDate),
-            makeLine(0, fromDate),
-            makeLine(1, fromDate),
-          ],
-          config: BezierChartConfig(
-            footerHeight: 50,
-            xAxisTextStyle: TextStyle(color: Colors.black12),
-            displayYAxis: true,
-            yAxisTextStyle: TextStyle(color: Colors.black12),
-            stepsYAxis: 50000,
-            pinchZoom: true,
-            verticalIndicatorStrokeWidth: 2.0,
-            verticalIndicatorColor: Colors.black12,
-            showVerticalIndicator: true,
-          ),
+    return SizedBox(
+      height: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width,
+      child: BezierChart(
+        bezierChartScale: BezierChartScale.WEEKLY,
+        fromDate: fromDate,
+        toDate: toDate,
+        selectedDate: toDate,
+        series: [
+          makeSumLine(fromDate),
+          makeLine(0, fromDate),
+          makeLine(1, fromDate),
+        ],
+        config: BezierChartConfig(
+          footerHeight: 50,
+          xAxisTextStyle: TextStyle(color: Colors.black12),
+          displayYAxis: true,
+          yAxisTextStyle: TextStyle(color: Colors.black12),
+          stepsYAxis: 50000,
+          pinchZoom: true,
+          verticalIndicatorStrokeWidth: 2.0,
+          verticalIndicatorColor: Colors.black12,
+          showVerticalIndicator: true,
         ),
       ),
     );

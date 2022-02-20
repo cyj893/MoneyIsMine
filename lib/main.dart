@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'db_helper/InputsProvider.dart';
 import 'package:provider/provider.dart';
 import 'db_helper/DBHelper.dart';
 import 'pages/HomePage.dart';
@@ -11,6 +12,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => InputsProvider()),
         ChangeNotifierProvider(create: (_) => ColorProvider()),
       ],
       child: MyApp(),
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Color> paletteProvider = context.watch<ColorProvider>().palette;
     context.read<CategoryProvider>().init();
+    context.read<InputsProvider>().init();
     print(context.read<CategoryProvider>().categories);
     return MaterialApp(
       theme: ThemeData(

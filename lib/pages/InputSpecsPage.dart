@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:money_is_mine/db_helper/InputsProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../db_helper/DBHelper.dart';
@@ -30,6 +31,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
 
   String pageName = "내역 추가";
   bool isUpdateLoaded = false;
+  List<bool> inputBoolArr = [];
 
   List<int> typeBool = [-1];
 
@@ -204,6 +206,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     paletteProvider = context.watch<ColorProvider>().palette;
     categoryNames = context.watch<CategoryProvider>().categories;
     categoryMap = context.watch<CategoryProvider>().map;
+    inputBoolArr = context.watch<InputsProvider>().inputBoolArr;
     if( !isUpdateLoaded ) setInstance();
     return Scaffold(
       appBar: AppBar(
@@ -219,15 +222,13 @@ class InputSpecsPageState extends State<InputSpecsPage> {
             child: Column(
               children: <Widget>[
                 TypeCon(typeBool, paletteProvider[1]), const Divider(),
-                MethodCon(methodBool, paletteProvider[1]), const Divider(),
-                CategoryCon(categoryBool, categoryNames, categoryMap,
-                    paletteProvider[0], paletteProvider[1], paletteProvider[3]), const Divider(),
-                ContentsCon(contents), const Divider(),
+                inputBoolArr[1] ? Column(children: [MethodCon(methodBool, paletteProvider[1]), const Divider()],) : const SizedBox.shrink(),
+                inputBoolArr[2] ? Column(children: [CategoryCon(categoryBool, categoryNames, categoryMap, paletteProvider[0], paletteProvider[1], paletteProvider[3]), const Divider()],) : const SizedBox.shrink(),
+                inputBoolArr[3] ? Column(children: [ContentsCon(contents), const Divider()],) : const SizedBox.shrink(),
                 MoneyCon(money, paletteProvider[3]), const Divider(),
-                DateTimeCon(dateTime, nowPage, mw, mwBoolArr,
-                    isFixed, repeatVal, paletteProvider[0], paletteProvider[1], paletteProvider[3]), const Divider(),
-                MemoCon(memo), const Divider(),
-                PicCon(picbools, _images, _existingImages, paletteProvider[1]), const Divider(),
+                inputBoolArr[5] ? Column(children: [DateTimeCon(dateTime, nowPage, mw, mwBoolArr, isFixed, repeatVal, paletteProvider[0], paletteProvider[1], paletteProvider[3]), const Divider()],) : const SizedBox.shrink(),
+                inputBoolArr[6] ? Column(children: [MemoCon(memo), const Divider()],) : const SizedBox.shrink(),
+                inputBoolArr[7] ? Column(children: [PicCon(picbools, _images, _existingImages, paletteProvider[1]), const Divider()],) : SizedBox.shrink(),
               ],
             ),
           )
