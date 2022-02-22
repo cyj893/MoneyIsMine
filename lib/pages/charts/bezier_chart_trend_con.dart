@@ -17,7 +17,7 @@ class TrendCon extends StatefulWidget {
 
 class TrendConState extends State<TrendCon> {
   List<Color> paletteProvider = [];
-  List<List<Color>> palette = [
+  List<List<Color>> palette = const [
     [Color.fromRGBO(225, 39, 0, 0.7), Color.fromRGBO(255, 78, 2, 0.7), Color.fromRGBO(254, 120, 39, 0.7), Color.fromRGBO(255, 162, 69, 0.7), Color.fromRGBO(254, 199, 105, 0.7), Color.fromRGBO(254, 220, 139, 0.7), Color(0xff9F2B2B)],
     [Color.fromRGBO(0, 39, 225, 0.7), Color.fromRGBO(2, 78, 255, 0.7), Color.fromRGBO(39, 120, 254, 0.7), Color.fromRGBO(69, 162, 255, 0.7), Color.fromRGBO(105, 199, 254, 0.7), Color.fromRGBO(139, 220, 254, 0.7), Color(0xff2B2B9F)],
   ];
@@ -44,17 +44,17 @@ class TrendConState extends State<TrendCon> {
     now = DateTime(now.year, now.month, now.day);
     while( t != now ){
       String s = DateFormat('yy/MM/dd').format(t);
-      if( DateSpecsMap[type].containsKey(s) ){
+      if( dateSpecsMap[type].containsKey(s) ){
         int m = type == 0 ? -1 : 1;
-        maxVal = maxVal > m*DateSpecsMap[type][s]! ? maxVal : m*DateSpecsMap[type][s]!;
-        list.add(DataPoint<DateTime>(value: m * DateSpecsMap[type][s]!.toDouble(), xAxis: t));
+        maxVal = maxVal > m*dateSpecsMap[type][s]! ? maxVal : m*dateSpecsMap[type][s]!;
+        list.add(DataPoint<DateTime>(value: m * dateSpecsMap[type][s]!.toDouble(), xAxis: t));
       }
       t = t.add(const Duration(days: 1));
     }
     String s = DateFormat('yy/MM/dd').format(t);
-    if( DateSpecsMap[type].containsKey(s) ){
+    if( dateSpecsMap[type].containsKey(s) ){
       int m = type == 0 ? -1 : 1;
-      list.add(DataPoint<DateTime>(value: m * DateSpecsMap[type][s]!.toDouble(), xAxis: t));
+      list.add(DataPoint<DateTime>(value: m * dateSpecsMap[type][s]!.toDouble(), xAxis: t));
     }
     return BezierLine(
       lineColor: palette[type][2],
@@ -72,30 +72,30 @@ class TrendConState extends State<TrendCon> {
     int sum = 0;
     while( t != now ){
       String s = DateFormat('yy/MM/dd').format(t);
-      if( DateSpecsMap[2].containsKey(s) ){
-        sum += DateSpecsMap[2][s]!;
+      if( dateSpecsMap[2].containsKey(s) ){
+        sum += dateSpecsMap[2][s]!;
       }
       list.add(DataPoint<DateTime>(value: sum.toDouble(), xAxis: t));
       t = t.add(const Duration(days: 1));
     }
     String s = DateFormat('yy/MM/dd').format(t);
-    if( DateSpecsMap[2].containsKey(s) ){
-      sum += DateSpecsMap[2][s]!;
+    if( dateSpecsMap[2].containsKey(s) ){
+      sum += dateSpecsMap[2][s]!;
     }
     list.add(DataPoint<DateTime>(value: sum.toDouble(), xAxis: t));
     return BezierLine(
-      lineColor: Color(0x7fafdbbb),
+      lineColor: const Color(0x7fafdbbb),
       lineStrokeWidth: 2.0,
       label: "합계",
       data: list,
     );
   }
 
-  List<Map<String, int>> DateSpecsMap = [{}, {}, {}];
+  List<Map<String, int>> dateSpecsMap = [{}, {}, {}];
 
   Widget sample2(BuildContext context, data) {
-    DateSpecsMap = data;
-    if( DateSpecsMap[0].isEmpty ){
+    dateSpecsMap = data;
+    if( dateSpecsMap[0].isEmpty ){
       return SizedBox(
         height: MediaQuery.of(context).size.width/2,
         width: MediaQuery.of(context).size.width,
@@ -126,9 +126,9 @@ class TrendConState extends State<TrendCon> {
         ],
         config: BezierChartConfig(
           footerHeight: 50,
-          xAxisTextStyle: TextStyle(color: Colors.black12),
+          xAxisTextStyle: const TextStyle(color: Colors.black12),
           displayYAxis: true,
-          yAxisTextStyle: TextStyle(color: Colors.black12),
+          yAxisTextStyle: const TextStyle(color: Colors.black12),
           stepsYAxis: 50000,
           pinchZoom: true,
           verticalIndicatorStrokeWidth: 2.0,
@@ -145,10 +145,10 @@ class TrendConState extends State<TrendCon> {
     return MyCard(
       child: Column(
         children: <Widget>[
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           Row(
             children: [
-              SizedBox(width: 16,),
+              const SizedBox(width: 16,),
               Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,

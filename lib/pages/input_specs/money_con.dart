@@ -44,7 +44,7 @@ class MoneyConState extends State<MoneyCon> {
     return isMoneyFocused
         ? Column(
             children: [
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               Row(
                 children: [
                   CustomButton( onTap: () { addMoney(1000); }, text: "+1천", textColor: widget.textColor, ),
@@ -57,14 +57,14 @@ class MoneyConState extends State<MoneyCon> {
               )
             ],
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 
   AnimatedContainer makeMoneyCon(){
     return AnimatedContainer(
       padding: const EdgeInsets.only(left: 8, right: 8),
       height: isMoneyFocused ? 110 : 50,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       child: SingleChildScrollView(
         child: Column(
           children: [

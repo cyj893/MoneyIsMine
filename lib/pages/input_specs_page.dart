@@ -122,7 +122,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
     }
     else{
       for(int i = 0; i < 7; i++){
-        DateTime date = DateTime.now();
+        DateTime date = dt;
         if( mwBoolArr[mw[0]][i] == false ) continue;
         date = date.subtract(Duration(days: date.weekday - 1 - i));
         for(int j = 0; j < repeatVal[0]; j++){
@@ -228,7 +228,7 @@ class InputSpecsPageState extends State<InputSpecsPage> {
                 MoneyCon(money, paletteProvider[3]), const Divider(),
                 inputBoolArr[5] ? Column(children: [DateTimeCon(dateTime, nowPage, mw, mwBoolArr, isFixed, repeatVal, paletteProvider[0], paletteProvider[1], paletteProvider[3]), const Divider()],) : const SizedBox.shrink(),
                 inputBoolArr[6] ? Column(children: [MemoCon(memo), const Divider()],) : const SizedBox.shrink(),
-                inputBoolArr[7] ? Column(children: [PicCon(picbools, _images, _existingImages, paletteProvider[1]), const Divider()],) : SizedBox.shrink(),
+                inputBoolArr[7] ? Column(children: [PicCon(picbools, _images, _existingImages, paletteProvider[1]), const Divider()],) : const SizedBox.shrink(),
               ],
             ),
           )
